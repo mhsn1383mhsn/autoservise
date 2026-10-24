@@ -39,5 +39,6 @@ const { minify } = require('html-minifier-terser');
   const out = path.join(__dirname, 'www');
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, 'index.html'), html);
+  for (const size of [32, 144, 180, 192, 512]) fs.copyFileSync(path.join(__dirname, `icon-${size}.png`), path.join(out, `icon-${size}.png`));
   console.log('built www/index.html', (html.length / 1024).toFixed(0) + ' KB');
 })().catch(e => { console.error(e); process.exit(1); });
