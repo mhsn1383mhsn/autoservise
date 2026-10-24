@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>اتو سرویس</title>
 <!-- removed for native -->
 <!-- removed for native -->
@@ -1251,6 +1251,14 @@ h1,h2,h3{letter-spacing:-.3px;}
   0%,100%{transform:translateY(0);}
   50%{transform:translateY(-6px);}
 }
+/* ===== safe-area overrides (env()=0 when the WebView is not edge-to-edge) ===== */
+html,body{overflow-x:hidden;max-width:100%;}
+body{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px));}
+.topbar{padding-top:calc(18px + env(safe-area-inset-top,0px));}
+body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
+#topBanner{padding-top:calc(11px + env(safe-area-inset-top,0px));}
+.toast{top:calc(16px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);}
+.modal-overlay{padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));}
 </style>
 </head>
 <body>
@@ -4494,6 +4502,8 @@ function drawMonthChart(canvas, months, mode){
   });
 }
 
+let chartMode = 'rev';
+let topItemsTab = 'profit';
 function computeReportPrev(){
   const range = getReportRange();
   if(!range.from || !range.to) return null;
@@ -5562,7 +5572,7 @@ function bulkSendReminders(list){
     if(!phone){ sendNext(i+1); return; }
     const wa = phone.startsWith('0') ? '98'+phone.slice(1) : phone;
     const txt = buildReminderTextByTemplate(x.last, x.plate, x.person);
-    openWhatsApp(person.phone||phone, txt);
+    openWhatsApp(x.person.phone||phone, txt);
     if(x.last && x.last.id) markReminderSent(x.last.id);
     sent++; setTimeout(()=>sendNext(i+1), delay);
   };
