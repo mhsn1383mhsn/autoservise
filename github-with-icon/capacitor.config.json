@@ -1,0 +1,6 @@
+{
+  "appId": "com.autoservice.app",
+  "appName": "اتو سرویس",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}

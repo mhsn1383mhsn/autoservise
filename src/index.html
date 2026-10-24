@@ -2,14 +2,12 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>اتو سرویس</title>
-<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<!-- removed for native -->
+<!-- removed for native -->
+<!-- removed for native -->
 <meta name="theme-color" content="#0B0B0D">
-<meta name="msapplication-TileImage" content="icon-144.png">
-<meta name="msapplication-TileColor" content="#0B0B0D">
 <style>
 /* فونت لوکال وزیرمتن — آفلاین */
 @font-face{font-family:'Vazirmatn';src:url('fonts/Vazirmatn-Regular.woff2') format('woff2');font-weight:400;font-display:swap;}
@@ -75,7 +73,7 @@ a{color:inherit;text-decoration:none;}
 /* ===== topbar ===== */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 16px 10px;}
 .brand{display:flex;align-items:center;gap:12px;}
-.brand-mark{width:46px;height:46px;border-radius:13px;overflow:hidden;background:#0b0b0d;border:1px solid rgba(255,35,45,.65);box-shadow:0 4px 14px -3px rgba(255,0,0,.3);flex-shrink:0;}
+.brand-mark{width:46px;height:46px;border-radius:13px;overflow:hidden;background:#fff;border:1px solid rgba(194,39,45,.35);box-shadow:0 4px 14px -3px rgba(194,39,45,.4),inset 0 1px 0 rgba(255,255,255,.5);flex-shrink:0;}
 .brand-mark img{width:100%;height:100%;object-fit:cover;display:block;}
 .brand-text h1{font-size:16.5px;font-weight:800;margin:0;letter-spacing:.2px;}
 .brand-text .tag{font-size:10.5px;color:var(--muted);margin-top:2px;}
@@ -1253,61 +1251,6 @@ h1,h2,h3{letter-spacing:-.3px;}
   0%,100%{transform:translateY(0);}
   50%{transform:translateY(-6px);}
 }
-
-/* Android WebView safe-area fixes */
-html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden;}
-html{min-height:100%;height:100%;}
-body{
-  min-height:100vh;
-  min-height:100dvh;
-  padding-top:0;
-  padding-left:env(safe-area-inset-left, 0px);
-  padding-right:env(safe-area-inset-right, 0px);
-  padding-bottom:calc(86px + env(safe-area-inset-bottom, 0px));
-  box-sizing:border-box;
-  -webkit-text-size-adjust:100%;
-  -webkit-overflow-scrolling:touch;
-}
-.app{
-  width:100%;
-  max-width:900px;
-  min-height:100vh;
-  min-height:100dvh;
-  box-sizing:border-box;
-  padding-bottom:calc(76px + env(safe-area-inset-bottom, 0px));
-}
-.topbar{
-  padding-top:calc(18px + env(safe-area-inset-top, 0px));
-  padding-left:calc(16px + env(safe-area-inset-left, 0px));
-  padding-right:calc(16px + env(safe-area-inset-right, 0px));
-}
-.view{box-sizing:border-box;width:100%;max-width:100%;}
-.view.active{display:block;}
-.tabbar{
-  padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
-  padding-left:calc(6px + env(safe-area-inset-left, 0px));
-  padding-right:calc(6px + env(safe-area-inset-right, 0px));
-  box-sizing:border-box;
-  max-height:calc(76px + env(safe-area-inset-bottom, 0px));
-}
-.sheet{
-  max-height:88vh;
-  max-height:88dvh;
-  box-sizing:border-box;
-  padding:18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
-}
-.toast{top:calc(16px + env(safe-area-inset-top, 0px));}
-.modal-overlay{
-  padding:calc(20px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px));
-  box-sizing:border-box;
-}
-#topBanner{
-  padding-top:calc(11px + env(safe-area-inset-top, 0px));
-  padding-left:calc(14px + env(safe-area-inset-left, 0px));
-  padding-right:calc(14px + env(safe-area-inset-right, 0px));
-}
-body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top, 0px));}
-
 </style>
 </head>
 <body>
@@ -1322,7 +1265,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top, 0px));}
 
   <div class="topbar">
     <div class="brand">
-      <div class="brand-mark"><img src="icon-192.png" alt="لوگوی اتوسرویس" onerror="this.style.display='none'"></div>
+      <div class="brand-mark"><img src="icon-192.png" alt="لوگو"></div>
       <div class="brand-text">
         <h1>اتو سرویس</h1>
         <div class="tag" id="dateChip">—</div>
@@ -1676,6 +1619,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top, 0px));}
 
   
 <div id="licBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:50;text-align:center;padding:8px;font-size:12px;font-weight:800;background:var(--warn-bg);color:var(--warn)"></div>
+<!-- بخش لایسنس موقتاً کامنت شده است.
 <div id="licenseGate">
   <div class="lic-card">
     <div style="font-size:42px;margin-bottom:6px">🔑</div>
@@ -1685,6 +1629,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top, 0px));}
     <button class="btn btn-primary btn-block" id="licBtn">فعال‌سازی</button>
   </div>
 </div>
+-->
 <div class="sheet-overlay" id="sheetOverlay">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -3780,10 +3725,10 @@ function licDeviceId(){
   }
   return d;
 }
-// --- بخش لایسنس فعال شد ---
+/* --- شروع بخش کامنت‌شدهٔ لایسنس (برای فعال‌سازی دوباره، این بلوک را از کامنت درآورید) ---
 // ============================================================
-// LICENSE (Supabase)
-// ============================================================ 
+   LICENSE (Supabase)
+   ============================================================ 
 const LIC_URL='https://kmjdyaauwoijjlgxynpa.supabase.co/functions/v1/license';
 const LIC_PUB='MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEb81CUM48To5Q1nsoGnhnKB7KPVqTNm1gd4R3UnGFvHYxT9Dc+jvxhBIfJoqZYDHMU5hV3aObRbRi2EndIHwkYg==';
 const LIC_MSG={relogin:'نشست شما توسط مدیر پایان یافت؛ لطفاً دوباره کلید لایسنس را وارد کنید.',invalid:'کلید لایسنس معتبر نیست یا مسدود شده است.',expired:'مدت اعتبار این لایسنس تمام شده است.',other_device:'این لایسنس روی دستگاه دیگری فعال شده است.',clock:'ساعت دستگاه نادرست است. تاریخ و ساعت را اصلاح کنید.',offline_expired:'برای تأیید لایسنس باید یک‌بار به اینترنت وصل شوید.',none:'برای استفاده از برنامه کلید لایسنس را وارد کنید.',error:'خطا در ارتباط با سرور؛ اینترنت را بررسی کنید.',server_error:'خطای سرور؛ کمی بعد دوباره تلاش کنید.',bad_request:'کلید را کامل وارد کنید.'};
@@ -3851,7 +3796,7 @@ document.getElementById('licBtn').onclick=async()=>{
   else document.getElementById('licMsg').textContent=LIC_MSG[r]||LIC_MSG.error;
 };
 
-// --- پایان بخش لایسنس ---
+--- پایان بخش کامنت‌شدهٔ لایسنس --- */
 /* ============================================================
    CLOUD SYNC (Supabase) — merge per record, last-write-wins
    ============================================================ */
@@ -5741,10 +5686,8 @@ document.addEventListener('click', function delegatedWaCall(e){
   if(call){ e.preventDefault(); openCall(call.dataset.callPhone); return; }
 });
 
-// بررسی لایسنس موقتاً کامنت شده تا برنامه برای تست بدون لایسنس اجرا شود.
-// licStart();
+// لایسنس موقتاً غیرفعال است؛ برنامه مستقیم اجرا می‌شود.
 init();
-startSync();
 
 // Service Worker حذف شد — برای اندروید نیتیو لازم نیست
 </script>
