@@ -1676,7 +1676,6 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top, 0px));}
 
   
 <div id="licBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:50;text-align:center;padding:8px;font-size:12px;font-weight:800;background:var(--warn-bg);color:var(--warn)"></div>
-<!-- بخش لایسنس موقتاً کامنت شده است.
 <div id="licenseGate">
   <div class="lic-card">
     <div style="font-size:42px;margin-bottom:6px">🔑</div>
@@ -1686,7 +1685,6 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top, 0px));}
     <button class="btn btn-primary btn-block" id="licBtn">فعال‌سازی</button>
   </div>
 </div>
--->
 <div class="sheet-overlay" id="sheetOverlay">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -3782,10 +3780,10 @@ function licDeviceId(){
   }
   return d;
 }
-/* --- شروع بخش کامنت‌شدهٔ لایسنس (برای فعال‌سازی دوباره، این بلوک را از کامنت درآورید) ---
+// --- بخش لایسنس فعال شد ---
 // ============================================================
-   LICENSE (Supabase)
-   ============================================================ 
+// LICENSE (Supabase)
+// ============================================================ 
 const LIC_URL='https://kmjdyaauwoijjlgxynpa.supabase.co/functions/v1/license';
 const LIC_PUB='MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEb81CUM48To5Q1nsoGnhnKB7KPVqTNm1gd4R3UnGFvHYxT9Dc+jvxhBIfJoqZYDHMU5hV3aObRbRi2EndIHwkYg==';
 const LIC_MSG={relogin:'نشست شما توسط مدیر پایان یافت؛ لطفاً دوباره کلید لایسنس را وارد کنید.',invalid:'کلید لایسنس معتبر نیست یا مسدود شده است.',expired:'مدت اعتبار این لایسنس تمام شده است.',other_device:'این لایسنس روی دستگاه دیگری فعال شده است.',clock:'ساعت دستگاه نادرست است. تاریخ و ساعت را اصلاح کنید.',offline_expired:'برای تأیید لایسنس باید یک‌بار به اینترنت وصل شوید.',none:'برای استفاده از برنامه کلید لایسنس را وارد کنید.',error:'خطا در ارتباط با سرور؛ اینترنت را بررسی کنید.',server_error:'خطای سرور؛ کمی بعد دوباره تلاش کنید.',bad_request:'کلید را کامل وارد کنید.'};
@@ -3853,7 +3851,7 @@ document.getElementById('licBtn').onclick=async()=>{
   else document.getElementById('licMsg').textContent=LIC_MSG[r]||LIC_MSG.error;
 };
 
---- پایان بخش کامنت‌شدهٔ لایسنس --- */
+// --- پایان بخش لایسنس ---
 /* ============================================================
    CLOUD SYNC (Supabase) — merge per record, last-write-wins
    ============================================================ */
@@ -5743,8 +5741,10 @@ document.addEventListener('click', function delegatedWaCall(e){
   if(call){ e.preventDefault(); openCall(call.dataset.callPhone); return; }
 });
 
-// لایسنس موقتاً غیرفعال است؛ برنامه مستقیم اجرا می‌شود.
+// بررسی لایسنس موقتاً کامنت شده تا برنامه برای تست بدون لایسنس اجرا شود.
+// licStart();
 init();
+startSync();
 
 // Service Worker حذف شد — برای اندروید نیتیو لازم نیست
 </script>
