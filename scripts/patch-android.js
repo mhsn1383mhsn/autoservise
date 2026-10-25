@@ -136,7 +136,9 @@ public class MainActivity extends BridgeActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
-        getWindow().setNavigationBarDividerColor(Color.TRANSPARENT);
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            getWindow().setNavigationBarDividerColor(Color.TRANSPARENT);
+        }
         getWindow().getDecorView().setBackgroundColor(Color.parseColor("#0B0B0D"));
 
         super.onCreate(savedInstanceState);
@@ -188,6 +190,23 @@ public class MainActivity extends BridgeActivity {
     fs.writeFileSync(f, code);
     console.log('patch-android: MainActivity edge-to-edge ->', f);
   }
+})();
+
+// 6) خنثی‌کردن splash: تصویر splash حذف و با رنگ ساده تیره جایگزین می‌شود
+(function neutralizeSplash() {
+  let removed = 0;
+  (function walk(d) {
+    for (const n of fs.readdirSync(d)) {
+      const p = path.join(d, n);
+      if (fs.statSync(p).isDirectory()) { if (n.startsWith('drawable')) walk(p); }
+      else if (/^splash(_dark)?\.(png|jpg|webp|xml)$/.test(n) && path.basename(d).startsWith('drawable')) { fs.rmSync(p, { force: true }); removed++; }
+    }
+  })(res);
+  const dd = path.join(res, 'drawable');
+  fs.mkdirSync(dd, { recursive: true });
+  fs.writeFileSync(path.join(dd, 'splash.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n<shape xmlns:android="http://schemas.android.com/apk/res/android">\n    <solid android:color="#0B0B0D"/>\n</shape>\n');
+  console.log('patch-android: splash neutralized, removed', removed, 'files');
 })();
 
 console.log('patch-android: done');
