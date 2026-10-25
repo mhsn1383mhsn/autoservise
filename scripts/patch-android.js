@@ -132,16 +132,17 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // قبل از super — تمام‌صفحه
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        // قبل از super فقط رنگ‌ها؛ دست زدن به DecorView قبل از super باعث نوار عنوان می‌شود
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
         if (android.os.Build.VERSION.SDK_INT >= 28) {
             getWindow().setNavigationBarDividerColor(Color.TRANSPARENT);
         }
-        getWindow().getDecorView().setBackgroundColor(Color.parseColor("#0B0B0D"));
 
         super.onCreate(savedInstanceState);
+        // بعد از super — تمام‌صفحه و رنگ پس‌زمینه
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        getWindow().getDecorView().setBackgroundColor(Color.parseColor("#0B0B0D"));
         // کیبورد: تغییر اندازه محتوا
         getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
