@@ -159,15 +159,16 @@ public class MainActivity extends BridgeActivity {
         bars.setAppearanceLightStatusBars(false);
         bars.setAppearanceLightNavigationBars(false);
 
+        // پل پیامک — همزمان و قبل از بارگذاری صفحه ثبت می‌شود (با نام جدا تا Android/AndroidInsets بازنویسی نشوند)
+        smsBridge = new SmsBridge(this, getBridge().getWebView());
+        getBridge().getWebView().addJavascriptInterface(smsBridge, "AndroidSms");
+
         final float density = getResources().getDisplayMetrics().density;
 
         getBridge().getWebView().post(new Runnable() {
             @Override public void run() {
                 if (getBridge() != null && getBridge().getWebView() != null) {
                     getBridge().getWebView().addJavascriptInterface(new InsetsBridge(), "AndroidInsets");
-                    // پل پیامک — با نام جدا تا اینترفیس‌های دیگر بازنویسی نشوند
-                    smsBridge = new SmsBridge(MainActivity.this, getBridge().getWebView());
-                    getBridge().getWebView().addJavascriptInterface(smsBridge, "AndroidSms");
                 }
             }
         });
