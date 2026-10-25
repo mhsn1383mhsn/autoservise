@@ -6222,8 +6222,10 @@ function openMessagePreview(phone, text, personName){
   $('previewSms').onclick = ()=>{
     const finalText = ($('previewText').value||'').trim();
     if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
-    if(window.Android && typeof window.Android.sendSms==='function'){
-      try{ window.Android.sendSms(cleanPhone, finalText); showToast('پیامک ارسال شد','✅'); closeSheet(); return; }catch(e){}
+    const bridge = window.SMSBridge;
+    if(bridge && typeof bridge.sendOne === 'function'){
+      const handled = bridge.sendOne(cleanPhone, finalText);
+      if(handled){ closeSheet(); return; }
     }
     window.location.href = 'sms:'+cleanPhone+'?body='+encodeURIComponent(finalText);
     showToast('اپلیکیشن پیامک باز شد','📱');
@@ -6240,8 +6242,10 @@ function sendVia(method){
   if(!currentSendData) return;
   const { phone, text } = currentSendData;
   if(method==='sms'){
-    if(window.Android && typeof window.Android.sendSms==='function'){
-      try{ window.Android.sendSms(phone, text); showToast('پیامک ارسال شد','✅'); closeSheet(); currentSendData=null; return; }catch(e){}
+    const bridge = window.SMSBridge;
+    if(bridge && typeof bridge.sendOne === 'function'){
+      const handled = bridge.sendOne(phone, text);
+      if(handled){ closeSheet(); currentSendData=null; return; }
     }
     window.location.href = 'sms:'+phone+'?body='+encodeURIComponent(text);
     showToast('اپلیکیشن پیامک باز شد','📱');
@@ -6518,15 +6522,23 @@ init();
   const $id = id => document.getElementById(id);
 
   // ─── callbackهایی که از Java صدا زده می‌شوند ───
+  let pendingSingleSms = null;
   window.onSmsPermission = function(status){
     if(status === 'granted'){
       showToast('مجوز پیامک داده شد', '✅');
+      // اگر ارسال تکی منتظر مجوز بود، پس از تأیید از پل نیتیو ارسال شود.
+      if(pendingSingleSms){
+        const pending = pendingSingleSms;
+        pendingSingleSms = null;
+        setTimeout(()=>window.SMSBridge.sendOne(pending.phone, pending.message), 0);
+      }
       // اگر شیت ارسال گروهی باز است، دوباره رندر شود (با حفظ متن ویرایش‌شده)
       try{
         const ta = $id('bulkPreviewText');
         if(ta && window.__bulkCtx) openBulkPreview(ta.value, window.__bulkCtx.people);
       }catch(e){}
     } else {
+      pendingSingleSms = null;
       showToast('مجوز پیامک رد شد', '⚠️');
     }
   };
@@ -6592,20 +6604,29 @@ init();
       const cleanPhone = String(phone||'').replace(/\D/g,'');
       if(!cleanPhone){
         if(onResult) onResult({ok:false, error:'شماره نامعتبر'});
-        return;
+        showToast('شماره نامعتبر است', '⚠️');
+        return true;
       }
-      if(has('sendSms') && this.hasPermission()){
-        try{
-          nat().sendSms(cleanPhone, message);
-          if(onResult) onResult({ok:true, method:'native'});
-          return;
-        }catch(e){ console.warn('Native send failed:', e); }
+      if(has('sendSms')){
+        if(this.hasPermission()){
+          try{
+            nat().sendSms(cleanPhone, message);
+            // نتیجه واقعی ارسال از callback نیتیو onSmsResult دریافت می‌شود.
+            return true;
+          }catch(e){ console.warn('Native send failed:', e); }
+        } else if(has('requestSmsPermission')){
+          pendingSingleSms = {phone:cleanPhone, message:String(message||'')};
+          nat().requestSmsPermission();
+          return true;
+        }
       }
       try{
         window.location.href = 'sms:' + cleanPhone + '?body=' + encodeURIComponent(message);
         if(onResult) onResult({ok:true, method:'web'});
+        return true;
       }catch(e){
         if(onResult) onResult({ok:false, error:e.message});
+        return false;
       }
     },
 
