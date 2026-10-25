@@ -357,15 +357,20 @@ a{color:inherit;text-decoration:none;}
 .import-zone .s{font-size:10.5px;color:var(--muted);margin-top:3px;}
 
 /* ══ PRINT ══ */
+@page{size:A4;}
 @media print{
-  body *{visibility:hidden;}
-  .invoice-wrap, .invoice-wrap *{visibility:visible;}
-  .invoice-wrap{position:absolute;left:0;top:0;width:100%;border-radius:0;padding:20px;}
-  .sheet-overlay{position:static!important;opacity:1!important;pointer-events:auto!important;background:#fff!important;}
-  .sheet{box-shadow:none!important;border:none!important;max-height:none!important;max-width:100%!important;}
-  .sheet-head, .sheet-handle, .no-print{display:none!important;}
-  html,body{height:auto!important;overflow:visible!important;background:#fff!important;}
-  .sheet-overlay,.sheet,#sheetBody{overflow:visible!important;height:auto!important;}
+  html,body{height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important;color:#111!important;padding:0!important;margin:0!important;}
+  /* همهٔ بخش‌های برنامه حذف می‌شوند (نه فقط نامرئی)، وگرنه فضای خالی صفحهٔ دوم می‌سازند */
+  #app>*:not(#sheetOverlay){display:none!important;}
+  #app{display:block!important;max-width:none!important;margin:0!important;padding:0!important;}
+  #sheetOverlay{position:static!important;display:block!important;inset:auto!important;opacity:1!important;pointer-events:auto!important;background:#fff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;transition:none!important;animation:none!important;padding:0!important;height:auto!important;}
+  #sheetOverlay .sheet{position:static!important;display:block!important;transform:none!important;animation:none!important;transition:none!important;box-shadow:none!important;border:none!important;border-radius:0!important;background:#fff!important;max-height:none!important;max-width:100%!important;width:100%!important;height:auto!important;overflow:visible!important;padding:0!important;}
+  .sheet-head,.sheet-handle,.no-print,.toast{display:none!important;}
+  #sheetBody{display:block!important;overflow:visible!important;height:auto!important;}
+  .invoice-wrap{position:static!important;width:100%!important;box-shadow:none!important;border-radius:0!important;padding:6px!important;margin:0!important;}
+  .invoice-wrap .inv-row,.invoice-wrap .inv-info-grid,.invoice-wrap .inv-head,.invoice-wrap .inv-sign-box,.invoice-wrap .inv-footer,.invoice-wrap .inv-total{break-inside:avoid;page-break-inside:avoid;}
+  .invoice-wrap .inv-section-title{break-after:avoid;page-break-after:avoid;}
+  .invoice-wrap,.invoice-wrap *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
 
 /* ══ FEATURE: COST PRICE + PROFIT ══ */
@@ -1598,6 +1603,7 @@ input[type="text"],input[type="tel"],input[type="number"],input[type="search"],s
 .money-display.warn{background:rgba(255,176,32,.08);border-color:rgba(255,176,32,.3);}
 .money-display.warn .md-num,.money-display.warn .md-text{color:var(--warn);}
 .row2>.money-wrapper{grid-column:1/-1;}
+.settings-group[data-sg="defaults"]{overflow:visible;}
 
 /* ══ PATCH 4: Reduce Animations ══ */
 *{animation-duration:.15s!important;animation-iteration-count:1!important;}
@@ -1621,7 +1627,98 @@ input[type="text"],input[type="tel"],input[type="number"],input[type="search"],s
 
 /* ══ PATCH 3: Invoice بدون QR ══ */
 .inv-qr-box{display:none!important;}
-\n</style>
+\n/* ══ PATCH 2: طراحی جدید فرم سرویس (کارت تو در تو) ══ */
+.work-row{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;transition:all .2s ease;overflow:hidden;}
+.work-row.on{border-color:rgba(214,47,53,.4);background:var(--panel);box-shadow:0 4px 14px -6px rgba(214,47,53,.2);}
+.work-head{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:transparent;border:none;cursor:pointer;text-align:right;outline:none;}
+.work-head .work-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;transition:all .2s ease;position:relative;}
+.work-row.on .work-dot{border-color:var(--red-2);background:var(--red-2);box-shadow:none;}
+.work-row.on .work-dot::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;}
+.work-head .work-title{font-size:13.5px;font-weight:800;color:var(--paper);}
+.work-head .work-state{margin-right:auto;font-size:10px;font-weight:700;color:var(--muted);background:var(--panel-3);padding:4px 10px;border-radius:12px;}
+.work-head .work-state+.work-state{margin-right:4px;}
+.work-row.on .work-state{background:var(--red-bg);color:var(--red-2);}
+.work-row .work-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;margin-top:0;}
+.work-body-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:10px;}
+.work-field{display:flex;flex-direction:column;gap:4px;}
+.work-field label{font-size:10px;font-weight:700;color:var(--muted);margin-right:4px;}
+.work-field input,.work-field select{width:100%;background:var(--panel-3);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;color:var(--paper);height:42px;outline:none;transition:all .15s ease;}
+.work-field input:focus,.work-field select:focus{border-color:var(--red-2);background:var(--panel-2);}
+.work-field input[type="text"]{text-align:center;}
+#view-new .card{padding:16px 14px !important;}
+#view-new .row2{gap:8px !important;margin-bottom:10px !important;}
+#view-new .field label{font-size:11px !important;margin-bottom:6px !important;color:var(--muted);}
+#view-new .inp{padding:10px 12px !important;font-size:13px !important;height:42px !important;border-radius:10px !important;}
+#view-new .wizard-step-badge{margin-bottom:8px !important;}
+#view-new .section-title{margin:16px 0 10px !important;font-size:13px !important;}
+#view-new .date-quick{margin-top:6px !important;margin-bottom:14px !important;}
+#view-new .chip{padding:6px 12px !important;font-size:11px !important;}
+/* ══ PATCH 3: فرم سرویس — فشرده، یکدست و زیبا (فقط چیدمان/ظاهر؛ هیچ المانی حذف نشده) ══ */
+#view-new .card{padding:14px 12px 0 !important;border-radius:20px !important;}
+#view-new .plate-context{margin-bottom:6px !important;transform-origin:center;}
+#view-new .plate-context > *{transform:scale(.82);margin:-6px 0;}
+#view-new .card > .hint{margin-bottom:8px !important;font-size:11.5px !important;font-weight:700;color:var(--muted);}
+#view-new .wizard-step-badge{font-size:10.5px !important;padding:4px 11px !important;margin-bottom:10px !important;}
+#view-new .jcal-trigger{padding:8px 12px !important;border-radius:14px !important;}
+#view-new .date-quick{display:grid !important;grid-template-columns:repeat(4,1fr);gap:6px !important;margin:8px 0 12px !important;}
+#view-new .date-quick button{padding:7px 4px !important;font-size:10.5px !important;text-align:center;white-space:nowrap;}
+#view-new .prev-service-hint{padding:8px 10px !important;margin:0 0 10px !important;font-size:11px !important;border-radius:12px !important;}
+#view-new .field{margin-bottom:10px !important;}
+#view-new .row2{margin-bottom:0 !important;}
+#view-new .row2 .field{margin-bottom:6px !important;}
+#view-new .km-auto-row{margin:0 0 6px !important;}
+#view-new .chip-row{display:flex;flex-wrap:nowrap !important;overflow-x:auto;gap:6px !important;margin:0 0 12px !important;padding-bottom:2px;scrollbar-width:none;}
+#view-new .chip-row::-webkit-scrollbar{display:none;}
+#view-new .chip-row .chip{flex:none;white-space:nowrap;}
+#view-new #worksRow .chip-row{flex-wrap:wrap !important;overflow:visible;margin-bottom:6px !important;}
+#view-new .section-title{margin:14px 0 8px !important;padding-bottom:6px;border-bottom:1px solid var(--line);}
+/* قطعات: ردیف‌های غیرفعال دو‌ستونه، ردیف فعال تمام‌عرض */
+#view-new #partsArea{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+#view-new #partsArea .work-row{margin:0 !important;border-radius:14px;}
+#view-new #partsArea .work-row.on{grid-column:1/-1;order:-1;}
+#view-new #partsArea .work-head{padding:11px 12px;gap:8px;}
+#view-new #partsArea .work-dot{width:18px;height:18px;}
+#view-new #partsArea .work-title{font-size:12.5px;white-space:nowrap;}
+#view-new #partsArea .work-head .work-state{padding:3px 8px;font-size:9.5px;}
+#view-new #partsArea .work-row:not(.on) .work-state:last-child{display:none;}
+#view-new #partsArea .work-row.on .work-head{padding:11px 14px;}
+#view-new #partsArea .work-row.on .work-state{margin-right:auto;}
+#view-new .work-row .work-body{padding:0 14px 14px !important;gap:8px !important;}
+#view-new .work-body .work-field label{font-size:10px !important;margin-bottom:2px !important;}
+#view-new .work-body .work-field input,#view-new .work-body .custom-dd-trigger{height:40px !important;font-size:12.5px !important;border-radius:11px !important;}
+#view-new .work-body-grid{grid-template-columns:.8fr 1.2fr !important;gap:8px !important;}
+#view-new .work-body .money-wrapper{margin-top:4px !important;}
+#view-new .work-body .money-display{padding:4px 8px !important;border-radius:8px !important;min-height:0 !important;}
+#view-new .work-body .money-display .md-num{font-size:11.5px !important;}
+#view-new .work-body .money-display .md-text{font-size:9.5px !important;}
+/* کارهای دیگر */
+#view-new #worksRow .chip{padding:6px 11px !important;font-size:11px !important;}
+#view-new #worksRow .row2{grid-template-columns:1fr 1.4fr;gap:8px !important;align-items:start !important;margin:6px 0 0 !important;padding:8px 10px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;}
+#view-new #worksRow .row2 > div:first-child{font-size:11.5px !important;color:var(--paper) !important;padding-top:11px;}
+#view-new #worksRow .inp{height:38px !important;}
+#view-new #fWorkCustom{height:40px !important;}
+#view-new #btnAddWork{height:40px;padding:0 16px !important;}
+#view-new #fNote{min-height:56px !important;border-radius:12px !important;}
+#view-new #worksRow .row2 > div:first-child{grid-row:1/3;}
+#view-new #worksRow .money-wrapper{grid-column:2;margin:-2px 0 0 !important;}
+#view-new #worksRow .money-display{padding:3px 8px !important;min-height:0 !important;border-radius:8px !important;}
+#view-new #partsArea .work-row{padding:0 !important;}
+#view-new .km-auto-row:not(:has(*:not([style*="display:none"]):not(:empty))){margin:0 !important;}
+#view-new .work-body .money-display{flex-wrap:nowrap !important;gap:6px;}
+#view-new .work-body .money-display .md-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* جمع کل و دکمه‌ها */
+#view-new .live-total{margin:12px -12px 0 !important;padding:10px 14px !important;}
+#view-new .wizard-sticky-nav{padding:10px 0 14px !important;margin-top:0 !important;}
+/* ══ پنل کشویی دسته‌ها ══ */
+#catsPanelOverlay .sheet{max-width:520px;max-height:85vh;overflow-y:auto;}
+#catsPanelOverlay .list-item{border-radius:14px;margin-bottom:8px;padding:12px 14px;}
+#catsPanelOverlay .list-item .li-icon{width:38px;height:38px;font-size:16px;border-radius:10px;}
+#catsPanelOverlay .list-item .li-title{font-size:13px;font-weight:800;}
+#catsPanelOverlay .list-item .li-sub{font-size:10px;margin-top:2px;color:var(--muted);}
+#catsPanelOverlay .seg-btn-unit{transition:all .2s ease;}
+#catsPanelOverlay .seg-btn-unit:active{transform:scale(.96);}
+#catsPanelOverlay .grp-title{font-size:12px;font-weight:900;color:var(--red-2);margin-bottom:8px;}
+</style>
 <script>
 window.__setInsets=function(t,r,b,l){var st=document.documentElement.style;st.setProperty('--sat',t+'px');st.setProperty('--sar',r+'px');st.setProperty('--sab',b+'px');st.setProperty('--sal',l+'px');};
 try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInsets.right(),AndroidInsets.bottom(),AndroidInsets.left());}}catch(e){}
@@ -1888,7 +1985,7 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
     </div>
 
     <div class="settings-group" data-sg="cats">
-      <div class="settings-group-head">
+      <div class="settings-group-head" id="btnOpenCatsPanel">
         <span class="sg-ic">🗂️</span>
         <span class="sg-title">دسته‌های اصلی</span>
         <span class="sg-arrow">›</span>
@@ -1924,6 +2021,25 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
           <input class="inp" id="qIn_works" placeholder="مثلاً تنظیم فرمان" style="flex:1">
           <button class="btn btn-sage btn-sm" data-qadd="works">➕</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ══ تنظیمات پیش‌فرض سرویس ══ -->
+    <div class="settings-group" data-sg="defaults">
+      <div class="settings-group-head">
+        <span class="sg-ic">⚙️</span>
+        <span class="sg-title">تنظیمات پیش‌فرض سرویس</span>
+        <span class="sg-arrow">›</span>
+      </div>
+      <div class="settings-group-body">
+        <div class="hint" style="margin-top:6px;margin-bottom:10px">
+          این مقادیر هنگام ثبت سرویس جدید خودکار پر می‌شوند تا سریع‌تر کار کنید.
+        </div>
+        <div class="grp-title">🔧 کالا و قیمت پیش‌فرض هر دسته</div>
+        <div id="defaultPartsList"></div>
+        <div class="grp-title" style="margin-top:20px">🛠️ قیمت پیش‌فرض کارهای سریع</div>
+        <div id="defaultWorksList"></div>
+        <button class="btn btn-sage btn-block btn-sm" id="btnSaveDefaults" style="margin-top:12px">💾 ذخیره تنظیمات پیش‌فرض</button>
       </div>
     </div>
 
@@ -2159,7 +2275,7 @@ function attachMoneyDisplay(inputEl){
   update();
 }
 // فقط فیلدهای مبلغ (نه کیلومتر، پلاک، موبایل)
-const MONEY_INPUT_SELECTOR='[data-wp],[data-extraprice],#pAmount,#pCAmount,#iPrice,#iCost';
+const MONEY_INPUT_SELECTOR='[data-wp],[data-extraprice],[data-def-part-price],[data-def-work-price],#pAmount,#pCAmount,#iPrice,#iCost';
 function scanAndAttachMoneyInputs(){
   document.querySelectorAll(MONEY_INPUT_SELECTOR).forEach(attachMoneyDisplay);
 }
@@ -2345,7 +2461,9 @@ function defaultSync(){ return {meta:{services:{},people:{},inventory:{},debts:{
 function defaultState(){
   return { services:[], people:[], inventory:[], debts:[], cats:DEFAULT_CATS.map(c=>Object.assign({},c)), settings:{ displayName:'', theme:'dark', shopName:'اتو سرویس', shopPhone:'', shopAddress:'', reminderKm:3000, reminderDays:180,
       tplReminder: "سلام {name} عزیز 🌹\nیادآوری: موعد سرویس خودرو شما ({plate}) رسیده است.\n⏭️ سرویس بعدی: {km} کیلومتر\n\nمنتظرتون هستیم! 🚗\n{shop}\n📞 {phone}",
-      tplInvoice: "با تشکر از اعتماد شما 🙏"  }, quick:defaultQuick(), sync:defaultSync() };
+      tplInvoice: "با تشکر از اعتماد شما 🙏",
+      defaults:{ parts:{}, works:{} }   // سرویس‌های پیش‌فرض: parts[دسته]={itemId,price} ، works[کار]={price}
+    }, quick:defaultQuick(), sync:defaultSync() };
 }
 const LEGACY=[['oilFilter','فیلتر روغن'],['airFilter','فیلتر هوا'],['cabinFilter','فیلتر کابین'],['vaskazin','واسکازین'],['brakeOil','روغن ترمز']];
 function migrate(r){
@@ -2368,7 +2486,7 @@ function loadState(){
       inventory:Array.isArray(p.inventory)?p.inventory:[],
       debts:Array.isArray(p.debts)?p.debts:[],
       cats:(Array.isArray(p.cats)&&p.cats.length)?p.cats:DEFAULT_CATS.map(c=>Object.assign({},c)),
-      settings:Object.assign(d.settings,p.settings||{}),
+      settings:Object.assign(d.settings,p.settings||{},{ defaults:{ parts:Object.assign({},(p.settings&&p.settings.defaults&&p.settings.defaults.parts)||{}), works:Object.assign({},(p.settings&&p.settings.defaults&&p.settings.defaults.works)||{}) } }),
       quick:Object.assign(defaultQuick(),p.quick||{}),
       sync:Object.assign(defaultSync(),p.sync||{})
     });
@@ -2771,25 +2889,30 @@ function commaInput(el){
   el.addEventListener('input',()=>{ const n=toNum(el.value); el.value=n?thousands(n):''; });
 }
 function workRow(c,i){
-  const w=wizard.data.works[c.name]||{on:false,itemId:'',qty:'',name:''};
+  const w=wizard.data.works[c.name]||{on:false,itemId:'',qty:'',name:'',price:0};
   const items=STATE.inventory.filter(x=>x.cat===c.name);
   const it=items.find(x=>x.id===w.itemId);
+  const def=((STATE.settings.defaults||{}).parts||{})[c.name];
+  const hasDefault=def&&(def.itemId||def.price>0);
   return `<div class="work-row ${w.on?'on':''}">
-    <button type="button" class="work-head" data-wt="${i}"><span class="work-dot"></span><span>${escapeHtml(c.name)}</span><span class="work-state">${w.on?'فعال ✓':'برای ثبت کلیک کنید'}</span></button>
+    <button type="button" class="work-head" data-wt="${i}"><span class="work-dot"></span><span class="work-title">${escapeHtml(c.name)}</span>${!w.on&&hasDefault?`<span class="work-state" style="background:var(--sage-bg);color:var(--sage);border:1px solid rgba(90,232,150,.3)">پیش‌فرض</span>`:''}<span class="work-state">${w.on?'فعال':'غیرفعال'}</span></button>
     ${w.on?`<div class="work-body">
-      <select class="inp work-item-select" data-wi="${i}">
-        <option value="">🧍 بدون کسر از انبار (تأمین توسط مشتری)</option>
-        ${items.map(x=>`<option value="${x.id}" ${x.id===w.itemId?'selected':''}>${escapeHtml(x.name)} — ${qf(x.qty)} ${x.unit}</option>`).join('')}
-      </select>
-      <div class="row2">
-        <input class="inp" type="text" inputmode="decimal" data-wq="${i}" placeholder="مقدار (${it?it.unit:c.unit})" value="${escapeHtml(w.qty)}">
-        <input class="inp" type="text" data-wn="${i}" placeholder="برند / توضیح" value="${escapeHtml(w.name)}">
+      <div class="work-field">
+        <label>انتخاب از انبار:</label>
+        <select class="inp work-item-select" data-wi="${i}">
+          <option value="">🧍 بدون کسر از انبار (تأمین توسط مشتری)</option>
+          ${items.map(x=>`<option value="${x.id}" ${x.id===w.itemId?'selected':''}>${escapeHtml(x.name)} — (موجودی: ${qf(x.qty)} ${x.unit})</option>`).join('')}
+        </select>
       </div>
-      <div class="row2">
-        <input class="inp" type="text" inputmode="numeric" data-wp="${i}" placeholder="قیمت واحد (تومان)" value="${w.price?thousands(w.price):''}">
-        <div></div>
+      <div class="work-body-grid">
+        <div class="work-field"><label>تعداد / مقدار (${it?it.unit:c.unit}):</label>
+          <input type="text" inputmode="decimal" data-wq="${i}" value="${escapeHtml(w.qty||'')}"></div>
+        <div class="work-field"><label>قیمت واحد (تومان):</label>
+          <input type="text" inputmode="numeric" data-wp="${i}" value="${w.price?thousands(w.price):''}"></div>
       </div>
-      <div class="hint">${w.itemId?'این مقدار از موجودی انبار کسر می‌شود':'از انبار کسر نمی‌شود'}</div>
+      <div class="work-field"><label>برند / توضیح (اختیاری):</label>
+        <input type="text" data-wn="${i}" value="${escapeHtml(w.name)}" placeholder="مثلاً شل هلکس"></div>
+      <div style="font-size:10px;font-weight:700;text-align:center;padding:6px;border-radius:8px;margin-top:4px;${w.itemId?'background:var(--red-bg);color:var(--red-2)':'background:var(--panel-3);color:var(--muted)'}">${w.itemId?'⚠️ این مقدار از موجودی انبار کسر می‌شود':'✓ از انبار کسر نمی‌شود'}</div>
     </div>`:''}
   </div>`;
 }
@@ -2835,38 +2958,38 @@ function renderFormStage(host){
         <button type="button" data-dq="7">هفته پیش</button>
       </div>
       ${showPrevHint ? `
-        <div class="prev-service-hint">
-          🔔 آخرین سرویس این خودرو: <b>${fmtJalali(prevRec.date)}</b> در ${thousands(prevRec.kmCurrent)} کیلومتر
-          ${prevRec.kmNext?` · سرویس بعدی طبق قبل: <b>${thousands(prevRec.kmNext)}</b>`:''}
+        <div class="prev-service-hint" style="margin-bottom:12px">
+          🔔 آخرین سرویس: <b>${fmtJalali(prevRec.date)}</b> در ${thousands(prevRec.kmCurrent)} کیلومتر
+          ${prevRec.kmNext?` · سرویس بعدی: <b>${thousands(prevRec.kmNext)}</b>`:''}
         </div>
       `:''}
-      <div class="field">
-        <label>نوع روغن موتور</label>
-        <input type="text" id="fOilType" placeholder="مثلاً 5W40 نیمه‌سنتتیک" value="${escapeHtml(d.oilType)}">
-      </div>
       <div class="row2">
-        <div class="field"><label>کیلومتر فعلی</label><input type="text" inputmode="numeric" id="fKmCurrent" placeholder="۱۲۰٬۰۰۰" value="${d.kmCurrent?thousands(d.kmCurrent):''}"></div>
-        <div class="field"><label>سرویس بعدی (کیلومتر)</label><input type="text" inputmode="numeric" id="fKmNext" placeholder="۱۲۵٬۰۰۰" value="${d.kmNext?thousands(d.kmNext):''}"></div>
+        <div class="field" style="margin-bottom:8px"><label>کیلومتر فعلی</label><input type="text" inputmode="numeric" id="fKmCurrent" placeholder="۱۲۰٬۰۰۰" value="${d.kmCurrent?thousands(d.kmCurrent):''}"></div>
+        <div class="field" style="margin-bottom:8px"><label>سرویس بعدی</label><input type="text" inputmode="numeric" id="fKmNext" placeholder="۱۲۵٬۰۰۰" value="${d.kmNext?thousands(d.kmNext):''}"></div>
       </div>
-      <div class="km-auto-row">
-        <span class="chip chip-sm" id="kmSameBtn" style="display:none;background:var(--sage-bg);color:var(--sage);border-color:rgba(76,215,135,.4)">📌 همون کیلومتر قبلی (${prevRec?thousands(prevRec.kmCurrent):'—'})</span>
-        <span class="km-auto-hint">${prevRec?`کیلومتر قبلی: <b>${thousands(prevRec.kmCurrent)}</b>`:''}</span>
+      <div class="km-auto-row" style="margin-bottom:12px">
+        <span class="chip chip-sm" id="kmSameBtn" style="display:none;background:var(--sage-bg);color:var(--sage);border-color:rgba(76,215,135,.4)">📌 کیلومتر قبلی (${prevRec?thousands(prevRec.kmCurrent):'—'})</span>
+        <span class="km-auto-hint">${prevRec?`قبلی: <b>${thousands(prevRec.kmCurrent)}</b>`:''}</span>
       </div>
       <div class="chip-row" style="margin:6px 0 14px">${STATE.quick.kms.map(n=>`<span class="chip" data-kmadd="${n}">${thousands(n)}+</span>`).join('')}</div>
 
-      <div class="section-title"><span class="ic">🔧</span> قطعات و مواد تعویض‌شده</div>
-      <div class="hint" style="margin-bottom:8px">روی هر مورد بزنید تا فعال شود؛ کسر از انبار اختیاری است.</div>
-      <div id="partsArea">${STATE.cats.map(workRow).join('')}</div>
+      <div class="field">
+        <label>نوع روغن موتور</label>
+        <input type="text" id="fOilType" placeholder="مثلاً 5W40" value="${escapeHtml(d.oilType)}">
+      </div>
 
-      <div class="section-title"><span class="ic">🛠️</span> کارهایی که انجام شده</div>
+      <div class="section-title"><span class="ic">🔧</span> قطعات و مواد تعویض‌شده</div>
+            <div id="partsArea">${STATE.cats.map(workRow).join('')}</div>
+
+      <div class="section-title"><span class="ic">🛠️</span> کارهای دیگر</div>
       <div id="worksRow">${extraChips()}</div>
       <div style="display:flex;gap:8px;margin-top:10px">
-        <input type="text" id="fWorkCustom" class="inp" placeholder="کار دیگر... مثلاً شستشوی رادیاتور" style="flex:1">
-        <button type="button" class="btn btn-sm" id="btnAddWork" style="padding:11px 16px">➕ افزودن</button>
+        <input type="text" id="fWorkCustom" class="inp" placeholder="کار دیگر..." style="flex:1">
+        <button type="button" class="btn btn-sm" id="btnAddWork" style="padding:11px 16px">➕</button>
       </div>
 
       <div class="field" style="margin-top:14px"><label>توضیحات و یادداشت تکمیلی</label>
-        <textarea id="fNote" style="min-height:60px;font-family:inherit;direction:rtl;text-align:right;font-size:13px" placeholder="توضیح اضافه در صورت نیاز...">${escapeHtml(d.note)}</textarea></div>
+        <textarea id="fNote" style="min-height:60px;font-family:inherit;direction:rtl;text-align:right;font-size:13px" placeholder="توضیح اضافه...">${escapeHtml(d.note)}</textarea></div>
       <div class="live-total" id="liveTotal">
         <span class="lt-lbl">💰 جمع کل</span>
         <span class="lt-val empty">هنوز مبلغی تعیین نشده</span>
@@ -2935,7 +3058,16 @@ function renderFormStage(host){
     $('fKmNext').value=thousands(base+parseInt(c.dataset.kmadd)); lastKmAuto=$('fKmNext').value;
   });
   const refreshChips=()=>{ $('worksRow').innerHTML=extraChips(); scanAndAttachMoneyInputs(); };
-  $('worksRow').onclick=e=>{ const c=e.target.closest('[data-extra]'); if(!c) return; const n=c.dataset.extra; d.extraSel[n]=!d.extraSel[n]; refreshChips(); };
+  $('worksRow').onclick=e=>{
+    const c=e.target.closest('[data-extra]'); if(!c) return; const n=c.dataset.extra;
+    d.extraSel[n]=!d.extraSel[n];
+    // قیمت پیش‌فرض کار سریع (فقط اگر قیمتی وارد نشده)
+    if(d.extraSel[n]){
+      const def=((STATE.settings.defaults||{}).works||{})[n];
+      if(def && def.price>0){ if(!d.extraPrice) d.extraPrice={}; if(!d.extraPrice[n]) d.extraPrice[n]=def.price; }
+    }
+    refreshChips(); updTotal();
+  };
   $('worksRow').oninput=e=>{
     const t=e.target;
     if(t.dataset.extraprice!==undefined){
@@ -2956,13 +3088,27 @@ function renderFormStage(host){
   wh.onclick=e=>{
     const b=e.target.closest('[data-wt]'); if(!b) return;
     const c=STATE.cats[+b.dataset.wt]; const w=d.works[c.name]||(d.works[c.name]={on:false,itemId:'',qty:'',name:''});
-    w.on=!w.on; rerender();
+    w.on=!w.on;
+    // اگر تازه فعال شد و پیش‌فرض تعریف شده، خودکار پر کن (کالا + تعداد + قیمت)
+    if(w.on && !w.itemId){
+      const def=((STATE.settings.defaults||{}).parts||{})[c.name];
+      if(def){
+        const dit=def.itemId?STATE.inventory.find(x=>x.id===def.itemId&&x.cat===c.name):null;
+        if(dit){ w.itemId=dit.id; if(!w.qty) w.qty='1'; }
+        if(def.price>0) w.price=def.price;
+      }
+    }
+    rerender(); updTotal();
   };
   wh.onchange=e=>{
     const t=e.target; if(t.dataset.wi===undefined) return;
     const c=STATE.cats[+t.dataset.wi]; const w=d.works[c.name];
     w.itemId=t.value; if(w.itemId&&!w.qty) w.qty='1';
     const it=STATE.inventory.find(x=>x.id===w.itemId);
+    // قیمت هم‌راستا با کالای انتخاب‌شده: پیش‌فرض همان کالا، وگرنه قیمت انبار
+    const _def=((STATE.settings.defaults||{}).parts||{})[c.name];
+    if(it) w.price=(_def&&_def.itemId===it.id&&_def.price>0)?_def.price:(it.price||0);
+    else w.price=(_def&&!_def.itemId&&_def.price>0)?_def.price:0;
     if(it&&c.name==='روغن موتور'&&!$('fOilType').value.trim()) $('fOilType').value=it.name;
     rerender();
   };
@@ -4048,6 +4194,7 @@ function renderSettings(){
     if(STATE.cats.length<=1){ showToast('حداقل یک دسته لازم است','⚠️'); return; }
     STATE.cats.splice(+b.dataset.delcat,1); saveState(); renderSettings();
   });
+  try{ renderDefaultsUI(); }catch(e){ console.warn('defaults ui', e); }
 }
 let _settingsTimer=null;
 const _saveSettingsDebounced=()=>{ clearTimeout(_settingsTimer); _settingsTimer=setTimeout(()=>saveState(), 400); };
@@ -6718,6 +6865,69 @@ function openBulkPreview(text, people){
   };
 })();
 
+/* ══ سرویس‌های پیش‌فرض: رابط تنظیمات ══ */
+function renderDefaultsUI(){
+  const partsBox=$('defaultPartsList'), worksBox=$('defaultWorksList');
+  if(!partsBox||!worksBox) return;
+  if(!STATE.settings.defaults) STATE.settings.defaults={parts:{},works:{}};
+  const defParts=STATE.settings.defaults.parts||{}, defWorks=STATE.settings.defaults.works||{};
+
+  partsBox.innerHTML=STATE.cats.map(cat=>{
+    const catItems=STATE.inventory.filter(x=>x.cat===cat.name);
+    const cur=defParts[cat.name]||{itemId:'',price:0};
+    const options='<option value="">— بدون کالای پیش‌فرض —</option>'+catItems.map(i=>
+      `<option value="${i.id}" ${cur.itemId===i.id?'selected':''}>${escapeHtml(i.name)} (موجودی: ${qf(i.qty)})</option>`).join('');
+    return `<div class="form-section" style="padding:10px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:900;margin-bottom:6px;color:var(--red-2)">${escapeHtml(cat.name)}</div>
+      <select class="inp" data-def-part-item="${escapeHtml(cat.name)}" style="margin-bottom:6px">${options}</select>
+      <input type="text" inputmode="numeric" class="inp" data-def-part-price="${escapeHtml(cat.name)}" placeholder="قیمت پیش‌فرض (تومان)" value="${cur.price?thousands(cur.price):''}">
+    </div>`;
+  }).join('');
+
+  worksBox.innerHTML=(STATE.quick.works||[]).map(wName=>{
+    const p=(defWorks[wName]&&defWorks[wName].price)||0;
+    return `<div class="form-section" style="padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+      <div style="font-size:12px;font-weight:800;flex:1">${escapeHtml(wName)}</div>
+      <input type="text" inputmode="numeric" class="inp" data-def-work-price="${escapeHtml(wName)}" placeholder="قیمت (تومان)" value="${p?thousands(p):''}" style="width:130px;padding:8px">
+    </div>`;
+  }).join('')||'<div class="hint">ابتدا در «دسترسی سریع» کار تعریف کنید</div>';
+
+  partsBox.querySelectorAll('[data-def-part-price]').forEach(commaInput);
+  worksBox.querySelectorAll('[data-def-work-price]').forEach(commaInput);
+
+  // با انتخاب کالا، قیمت فروش آن کالا خودکار در فیلد قیمت می‌آید
+  partsBox.querySelectorAll('[data-def-part-item]').forEach(sel=>{
+    sel.addEventListener('change',()=>{
+      const pin=partsBox.querySelector('[data-def-part-price="'+CSS.escape(sel.dataset.defPartItem)+'"]');
+      const it=sel.value?STATE.inventory.find(x=>x.id===sel.value):null;
+      if(pin&&it&&it.price){ pin.value=thousands(it.price); pin.dispatchEvent(new Event('input',{bubbles:true})); }
+    });
+    patchWorkRowSelect(sel);   // dropdown سفارشی به‌جای select بومی
+  });
+  scanAndAttachMoneyInputs();
+
+  const btn=$('btnSaveDefaults');
+  if(btn&&!btn._bound){
+    btn._bound=true;
+    btn.onclick=()=>{
+      const parts={}, works={};
+      $('defaultPartsList').querySelectorAll('[data-def-part-item]').forEach(sel=>{
+        const cat=sel.dataset.defPartItem;
+        const pin=$('defaultPartsList').querySelector('[data-def-part-price="'+CSS.escape(cat)+'"]');
+        const price=toNum(pin&&pin.value);
+        if(sel.value||price>0) parts[cat]={itemId:sel.value,price:price};
+      });
+      $('defaultWorksList').querySelectorAll('[data-def-work-price]').forEach(inp=>{
+        const price=toNum(inp.value);
+        if(price>0) works[inp.dataset.defWorkPrice]={price:price};
+      });
+      STATE.settings.defaults={parts:parts,works:works};
+      saveState();
+      showToast('تنظیمات پیش‌فرض ذخیره شد','✅');
+    };
+  }
+}
+
 init();
 
 // Service Worker حذف شد — برای اندروید نیتیو لازم نیست
@@ -6859,6 +7069,78 @@ init();
       return true;
     }
   };
+})();
+</script>
+<!-- ══ پنل اختصاصی مدیریت دسته‌ها (Bottom Sheet) ══ -->
+<div class="sheet-overlay" id="catsPanelOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>مدیریت دسته‌بندی‌ها</h3>
+      <button class="sheet-close" id="catsPanelClose">✕</button>
+    </div>
+    <div id="catsPanelBody" style="padding-bottom:20px"></div>
+  </div>
+</div>
+<script>
+(function(){
+  const overlay=document.getElementById('catsPanelOverlay');
+  const body=document.getElementById('catsPanelBody');
+  const openBtn=document.getElementById('btnOpenCatsPanel');
+  let selectedUnit='عدد';
+  function refreshSettings(){ try{ renderSettings(); }catch(e){} }
+  function render(){
+    let html=`<div class="hint" style="margin-bottom:14px;line-height:1.8;text-align:center">هر دسته در انبار قابل تعریف کالاست و در ثبت سرویس به‌عنوان «کار انجام‌شده» ظاهر می‌شود.</div><div style="margin-bottom:16px">`;
+    html+=STATE.cats.map((c,i)=>{
+      const n=STATE.inventory.filter(x=>x.cat===c.name).length;
+      const liquid=c.unit==='لیتر';
+      return `<div class="list-item"><div class="li-icon">${liquid?'🛢️':'📦'}</div>
+        <div class="li-main"><div class="li-title">${escapeHtml(c.name)}</div>
+        <div class="li-sub">واحد: <b style="color:var(--paper)">${liquid?'لیتر (مایع)':'عدد (تکی)'}</b>${n?` · <span style="color:var(--red-2)">${toFa(n)} کالا</span>`:''}</div></div>
+        ${n?`<span class="badge-pill badge-no" style="font-size:9px">🔒 دارای کالا</span>`:`<button class="btn btn-ghost btn-sm" data-delcat-panel="${i}" style="color:var(--red-2);padding:6px 10px">🗑️</button>`}
+      </div>`;
+    }).join('');
+    html+=`</div><div style="border-top:1px dashed var(--line);margin:16px 0 0;padding-top:16px">
+      <div class="grp-title">➕ افزودن دسته جدید</div>
+      <div class="field" style="margin-bottom:10px"><label>نام دسته</label><input type="text" id="newCatNamePanel" class="inp" placeholder="مثلاً: روغن گیربکس"></div>
+      <div class="field" style="margin-bottom:14px"><label>نوع واحد</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button type="button" class="seg-btn-unit" data-unit="عدد" style="padding:10px;border-radius:10px;border:1px solid var(--line);font-size:12px;font-weight:800;cursor:pointer">📦 عدد</button>
+          <button type="button" class="seg-btn-unit" data-unit="لیتر" style="padding:10px;border-radius:10px;border:1px solid var(--line);font-size:12px;font-weight:800;cursor:pointer">🛢️ لیتر</button>
+        </div></div>
+      <button type="button" class="btn btn-primary btn-block" id="btnAddCatPanel">افزودن دسته</button></div>`;
+    body.innerHTML=html;
+    const unitBtns=body.querySelectorAll('.seg-btn-unit');
+    const paint=()=>unitBtns.forEach(b=>{
+      const on=b.dataset.unit===selectedUnit;
+      b.style.background=on?'linear-gradient(155deg,var(--red-2),var(--red))':'var(--panel-3)';
+      b.style.color=on?'#fff':'var(--paper)';
+      b.style.borderColor=on?'transparent':'var(--line)';
+    });
+    paint();
+    unitBtns.forEach(b=>b.addEventListener('click',()=>{ selectedUnit=b.dataset.unit; paint(); }));
+    body.querySelectorAll('[data-delcat-panel]').forEach(btn=>btn.addEventListener('click',()=>{
+      const idx=parseInt(btn.dataset.delcatPanel), cat=STATE.cats[idx]; if(!cat) return;
+      if(STATE.inventory.some(x=>x.cat===cat.name)){ showToast('این دسته کالا دارد و قابل حذف نیست','⚠️'); return; }
+      if(STATE.cats.length<=1){ showToast('حداقل یک دسته لازم است','⚠️'); return; }
+      if(!confirm('دسته «'+cat.name+'» حذف شود؟')) return;
+      STATE.cats.splice(idx,1); saveState(); refreshSettings(); render(); showToast('دسته حذف شد','🗑️');
+    }));
+    document.getElementById('btnAddCatPanel').addEventListener('click',()=>{
+      const inp=document.getElementById('newCatNamePanel'), n=inp.value.trim();
+      if(!n){ showToast('نام دسته را وارد کنید','⚠️'); return; }
+      if(STATE.cats.some(c=>c.name===n)){ showToast('این دسته وجود دارد','⚠️'); return; }
+      STATE.cats.push({name:n,unit:selectedUnit}); saveState(); refreshSettings(); render();
+      showToast('دسته «'+n+'» اضافه شد','✅');
+    });
+  }
+  window.renderCatsPanel=render;
+  if(openBtn) openBtn.addEventListener('click',e=>{
+    e.stopImmediatePropagation();   // جلوگیری از باز شدن آکاردئون قدیمی
+    render(); overlay.classList.add('show');
+  },true);
+  document.getElementById('catsPanelClose').addEventListener('click',()=>overlay.classList.remove('show'));
+  overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
 })();
 </script>
 </body>
