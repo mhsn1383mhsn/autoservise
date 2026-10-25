@@ -120,6 +120,7 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     private volatile int insTop = 0, insRight = 0, insBottom = 0, insLeft = 0;
     private SmsBridge smsBridge;
+    private PdfBridge pdfBridge;
 
     public class InsetsBridge {
         @JavascriptInterface public int top() { return insTop; }
@@ -162,6 +163,9 @@ public class MainActivity extends BridgeActivity {
         // پل پیامک — همزمان و قبل از بارگذاری صفحه ثبت می‌شود (با نام جدا تا Android/AndroidInsets بازنویسی نشوند)
         smsBridge = new SmsBridge(this, getBridge().getWebView());
         getBridge().getWebView().addJavascriptInterface(smsBridge, "AndroidSms");
+        // پل PDF/چاپ (ذخیرهٔ فاکتور در Download)
+        pdfBridge = new PdfBridge(this, getBridge().getWebView());
+        getBridge().getWebView().addJavascriptInterface(pdfBridge, "AndroidPdf");
 
         final float density = getResources().getDisplayMetrics().density;
 
@@ -226,6 +230,14 @@ public class MainActivity extends BridgeActivity {
     const tpl = fs.readFileSync(path.join(root, 'android-src', 'SmsBridge.java.tpl'), 'utf8');
     fs.writeFileSync(path.join(path.dirname(f), 'SmsBridge.java'), tpl.replace('__PACKAGE__', pkg));
     console.log('patch-android: SmsBridge.java ->', path.dirname(f));
+
+    // PdfBridge.java کنار MainActivity + PdfPrint.java در پکیج android.print
+    const pdfTpl = fs.readFileSync(path.join(root, 'android-src', 'PdfBridge.java.tpl'), 'utf8');
+    fs.writeFileSync(path.join(path.dirname(f), 'PdfBridge.java'), pdfTpl.replace('__PACKAGE__', pkg));
+    const printDir = path.join(base, 'android', 'print');
+    fs.mkdirSync(printDir, { recursive: true });
+    fs.copyFileSync(path.join(root, 'android-src', 'PdfPrint.java.tpl'), path.join(printDir, 'PdfPrint.java'));
+    console.log('patch-android: PdfBridge.java + android/print/PdfPrint.java ->', path.dirname(f));
   }
 })();
 
