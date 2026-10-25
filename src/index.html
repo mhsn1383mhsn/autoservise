@@ -6257,46 +6257,120 @@ function sendVia(method){
   currentSendData = null;
 }
 function openBulkPreview(text, people){
-  $('sheetTitle').textContent = '📢 ارسال گروهی';
+  const $ = id => document.getElementById(id);
+  $('sheetTitle').textContent = '📢 ارسال گروهی پیامک';
   const body = $('sheetBody');
+
+  const validPeople = (people||[]).filter(p =>
+    p.phone && String(p.phone).replace(/\D/g,'').length >= 10
+  );
+  window.__bulkCtx = { people: validPeople };
+
+  if(!validPeople.length){
+    body.innerHTML = `
+      <div class="empty-state">
+        <div class="ic">⚠️</div>
+        <div class="t">شماره معتبری پیدا نشد</div>
+        <div class="s">مشتریان باید شماره تماس داشته باشند</div>
+      </div>
+      <button class="btn btn-ghost btn-block" id="bulkCancel" style="margin-top:12px;">بستن</button>`;
+    $('bulkCancel').onclick = closeSheet;
+    $('sheetOverlay').classList.add('show');
+    return;
+  }
+
+  const B = window.SMSBridge;
+  const canAuto = !!(B && B.canAutoSend());
+  const hasPerm = !!(B && B.hasPermission());
+
   body.innerHTML = `
-    <div class="hint" style="text-align:center;margin-bottom:12px;line-height:1.8">
-      📱 این پیام برای <b>${toFa(people.length)}</b> مشتری ارسال خواهد شد.
+    <div class="hint" style="text-align:center;margin-bottom:12px;line-height:1.8;">
+      📱 این پیام برای <b>${toFa(validPeople.length)}</b> مشتری ارسال می‌شود
     </div>
+
     <div class="field">
       <label>✏️ متن پیام (قابل ویرایش)</label>
       <textarea id="bulkPreviewText" class="inp" style="min-height:140px; direction:rtl; text-align:right; line-height:1.9; font-size:13px; padding:12px; white-space:pre-wrap;">${escapeHtml(text||'')}</textarea>
     </div>
-    <div class="hint" style="text-align:center;margin-top:8px;margin-bottom:14px;font-size:10.5px">
-      💡 می‌توانید متن بالا را قبل از ارسال ویرایش کنید.
+
+    ${canAuto ? (!hasPerm ? `
+      <div style="background:var(--warn-bg);color:var(--warn);padding:10px 12px;border-radius:10px;font-size:11.5px;font-weight:700;text-align:center;margin-bottom:10px;line-height:1.7;">
+        ⚠️ مجوز پیامک داده نشده<br>
+        <button class="btn btn-primary btn-sm" id="bulkRequestPerm" style="margin-top:8px;">🔐 اجازه ارسال پیامک</button>
+      </div>
+    ` : `
+      <div style="background:var(--sage-bg);color:var(--sage);padding:10px 12px;border-radius:10px;font-size:11.5px;font-weight:700;text-align:center;margin-bottom:10px;">
+        ✅ ارسال خودکار فعال است
+      </div>
+    `) : `
+      <div style="background:var(--warn-bg);color:var(--warn);padding:10px 12px;border-radius:10px;font-size:11.5px;font-weight:700;text-align:center;margin-bottom:10px;line-height:1.7;">
+        ⚠️ این نسخه از ارسال خودکار پشتیبانی نمی‌کند<br>
+        <small>پیامک‌ها یکی‌یکی باز می‌شوند</small>
+      </div>
+    `}
+
+    <div id="bulkProgress" style="display:none;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:6px;">
+        <span>در حال ارسال...</span>
+        <span id="bulkProgressText">۰ / ${toFa(validPeople.length)}</span>
+      </div>
+      <div style="height:8px;background:var(--panel-3);border-radius:4px;overflow:hidden;">
+        <div id="bulkProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--red-2),var(--red));transition:width .3s ease;"></div>
+      </div>
     </div>
+
     <div style="display:grid;gap:8px;">
-      <button class="btn btn-primary btn-block btn-lg" id="bulkSmsAll">📱 ارسال خودکار به همه</button>
-      <button class="btn btn-sage btn-block btn-lg" id="bulkSmsOne">📲 ارسال یکی‌یکی (لیست)</button>
+      ${canAuto && hasPerm ? `
+        <button class="btn btn-primary btn-block btn-lg" id="bulkSmsFast">⚡ ارسال خودکار به همه (${toFa(validPeople.length)})</button>
+      ` : ``}
+      <button class="btn ${canAuto && hasPerm ? 'btn-sage' : 'btn-primary'} btn-block btn-lg" id="bulkSmsOne">📲 ارسال یکی‌یکی (لیست)</button>
       <button class="btn btn-ghost btn-block" id="bulkCopyList">📋 کپی متن و لیست شماره‌ها</button>
       <button class="btn btn-ghost btn-block" id="bulkCancel">❌ انصراف</button>
-    </div>`;
-  const getText = ()=> ($('bulkPreviewText').value||'').trim();
-  $('bulkSmsAll').onclick = ()=>{
+    </div>
+  `;
+
+  const getText = () => ($('bulkPreviewText')?.value || '').trim();
+
+  // ─── درخواست مجوز ───
+  if($('bulkRequestPerm')){
+    $('bulkRequestPerm').onclick = () => { if(B) B.requestPermission(); };
+  }
+
+  // ─── ارسال خودکار گروهی ───
+  if($('bulkSmsFast')){
+    $('bulkSmsFast').onclick = () => {
+      const finalText = getText();
+      if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
+
+      const estimatedCost = validPeople.length * 300;
+      if(!confirm(
+        `ارسال پیامک به ${toFa(validPeople.length)} نفر\n\n` +
+        `هزینه تخمینی: ${money(estimatedCost)}\n\n` +
+        `ادامه می‌دهید؟`
+      )) return;
+
+      $('bulkSmsFast').disabled = true;
+      $('bulkProgress').style.display = 'block';
+
+      const ok = B.sendBulkFast(validPeople.map(p => p.phone), finalText);
+      if(!ok){
+        showToast('خطا در ارسال — از حالت یکی‌یکی استفاده کنید','⚠️');
+        $('bulkProgress').style.display = 'none';
+        $('bulkSmsFast').disabled = false;
+      }
+    };
+  }
+
+  // ─── ارسال یکی‌یکی (لیست؛ هر نفر با یک کلیک) ───
+  $('bulkSmsOne').onclick = () => {
     const finalText = getText();
     if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
-    if(!confirm('ارسال پیامک به '+toFa(people.length)+' مشتری؟')) return;
-    if(!STATE.settings) STATE.settings={};
+    if(!STATE.settings) STATE.settings = {};
     STATE.settings.adLastSent = Date.now(); saveState();
-    if(window.Android && typeof window.Android.sendBulkSms==='function'){
-      const numbers = people.map(p=>String(p.phone||'').replace(/\D/g,''));
-      try{ window.Android.sendBulkSms(JSON.stringify(numbers), finalText); showToast(toFa(numbers.length)+' پیامک در حال ارسال...','🚀'); closeSheet(); return; }catch(e){}
-    }
-    showToast('پل ارسال خودکار موجود نیست، از حالت یکی‌یکی استفاده کنید','⚠️');
-  };
-  $('bulkSmsOne').onclick = ()=>{
-    const finalText = getText();
-    if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
-    if(!STATE.settings) STATE.settings={};
-    STATE.settings.adLastSent = Date.now(); saveState();
+
     body.innerHTML = `
       <div class="hint" style="text-align:center;margin-bottom:12px;line-height:1.8">روی هر نام کلیک کنید تا پیامک برای او ارسال شود.</div>
-      ${people.map(p=>{
+      ${validPeople.map(p => {
         const phone = String(p.phone||'').replace(/\D/g,'');
         return `<div class="custom-select-item" data-bulk-person="${escapeHtml(phone)}" style="cursor:pointer">
           <div class="csi-label">${escapeHtml(p.name||'')} <span class="mono" style="font-size:10px;color:var(--muted);margin-right:8px">${toFa(p.phone||'')}</span></div>
@@ -6304,23 +6378,26 @@ function openBulkPreview(text, people){
         </div>`;
       }).join('')}
       <button class="btn btn-ghost btn-block" id="bulkDone" style="margin-top:14px">✓ اتمام ارسال</button>`;
-    body.querySelectorAll('[data-bulk-person]').forEach(el=>{
-      el.onclick = ()=>{
+
+    body.querySelectorAll('[data-bulk-person]').forEach(el => {
+      el.onclick = () => {
         const phone = el.dataset.bulkPerson;
-        if(window.Android && typeof window.Android.sendSms==='function'){
-          try{ window.Android.sendSms(phone, finalText); el.style.opacity='0.4'; return; }catch(e){}
-        }
-        window.location.href = 'sms:'+phone+'?body='+encodeURIComponent(finalText);
-        setTimeout(()=>{ el.style.opacity='0.4'; }, 500);
+        if(B) B.sendOne(phone, finalText);
+        else window.location.href = 'sms:' + phone + '?body=' + encodeURIComponent(finalText);
+        setTimeout(() => { el.style.opacity = '0.4'; }, 300);
       };
     });
-    $('bulkDone').onclick = ()=>{ closeSheet(); try{renderAll();}catch(e){} };
+    $('bulkDone').onclick = () => { closeSheet(); try{ renderAll(); }catch(e){} };
   };
-  $('bulkCopyList').onclick = ()=>{
+
+  // ─── کپی ───
+  $('bulkCopyList').onclick = () => {
     const finalText = getText();
-    const listText = finalText+'\n\n━━━━━━━━━━━━━━\n📋 لیست مشتریان:\n'+people.map(p=>`${p.name}: ${p.phone}`).join('\n');
-    copyToClipboard(listText, ok=>{ if(ok) showToast('متن و لیست کپی شد','📋'); });
+    const listText = finalText + '\n\n━━━━━━━━━━━━━━\n📋 لیست مشتریان:\n' +
+      validPeople.map(p => `${p.name}: ${p.phone}`).join('\n');
+    copyToClipboard(listText, ok => { if(ok) showToast('متن و لیست کپی شد','📋'); });
   };
+
   $('bulkCancel').onclick = closeSheet;
   $('sheetOverlay').classList.add('show');
 }
@@ -6425,6 +6502,128 @@ function openBulkPreview(text, people){
 init();
 
 // Service Worker حذف شد — برای اندروید نیتیو لازم نیست
+</script>
+<script id="sms-bridge-native">
+/* ============================================================
+   SMS BRIDGE NATIVE — برای APK
+   ============================================================ */
+(function(){
+  'use strict';
+  if(window.__smsBridgeNative) return;
+  window.__smsBridgeNative = true;
+
+  // اینترفیس جدید AndroidSms ترجیح داده می‌شود؛ اگر نبود به Android قدیمی برمی‌گردد
+  const nat = () => window.AndroidSms || window.Android || null;
+  const has = fn => { const n = nat(); return !!(n && typeof n[fn] === 'function'); };
+  const $id = id => document.getElementById(id);
+
+  // ─── callbackهایی که از Java صدا زده می‌شوند ───
+  window.onSmsPermission = function(status){
+    if(status === 'granted'){
+      showToast('مجوز پیامک داده شد', '✅');
+      // اگر شیت ارسال گروهی باز است، دوباره رندر شود (با حفظ متن ویرایش‌شده)
+      try{
+        const ta = $id('bulkPreviewText');
+        if(ta && window.__bulkCtx) openBulkPreview(ta.value, window.__bulkCtx.people);
+      }catch(e){}
+    } else {
+      showToast('مجوز پیامک رد شد', '⚠️');
+    }
+  };
+
+  window.onSmsBulkStart = function(data){
+    const total = (data && data.total) || 0;
+    const wrap = $id('bulkProgress'), bar = $id('bulkProgressBar'), txt = $id('bulkProgressText');
+    if(wrap) wrap.style.display = 'block';
+    if(bar) bar.style.width = '0%';
+    if(txt) txt.textContent = '۰ / ' + toFa(total);
+  };
+
+  window.onSmsBulkProgress = function(data){
+    const {current, total, failed} = data;
+    const bar = $id('bulkProgressBar'), txt = $id('bulkProgressText');
+    if(bar) bar.style.width = ((current/total)*100) + '%';
+    if(txt) txt.textContent = toFa(current) + ' / ' + toFa(total) +
+      (failed > 0 ? ' (' + toFa(failed) + ' ناموفق)' : '');
+  };
+
+  window.onSmsBulkComplete = function(data){
+    const {ok, sent, failed} = data;
+    const wrap = $id('bulkProgress');
+    const btn = $id('bulkSmsFast');
+    if(btn) btn.disabled = false;
+
+    if(ok){
+      showToast('ارسال کامل شد: ' + toFa(sent) + ' موفق' +
+        (failed > 0 ? ' · ' + toFa(failed) + ' ناموفق' : ''), failed > 0 ? '⚠️' : '✅');
+      if(!STATE.settings) STATE.settings = {};
+      STATE.settings.adLastSent = Date.now();
+      saveState();
+      setTimeout(() => { try{ closeSheet(); }catch(e){} }, 1800);
+    } else {
+      if(wrap) wrap.style.display = 'none';
+      const reasons = {permission:'مجوز پیامک داده نشده', empty_list:'لیست شماره‌ها خالی است', busy:'ارسال قبلی هنوز تمام نشده'};
+      showToast('ارسال ناموفق: ' + (reasons[data.error] || data.error || 'خطای نامشخص'), '⚠️');
+    }
+  };
+
+  window.onSmsResult = function(data){
+    if(data.ok){
+      showToast('پیامک ارسال شد', '✅');
+    } else {
+      showToast('ارسال ناموفق: ' + (data.error || 'خطا'), '⚠️');
+    }
+  };
+
+  // ─── API عمومی ───
+  window.SMSBridge = {
+    isNative(){ return has('sendSms'); },
+    canAutoSend(){ return has('sendBulkSmsFast'); },
+
+    requestPermission(){
+      if(has('requestSmsPermission')) nat().requestSmsPermission();
+    },
+    hasPermission(){
+      if(has('hasPermission')) return !!nat().hasPermission();
+      return false;
+    },
+
+    sendOne(phone, message, onResult){
+      const cleanPhone = String(phone||'').replace(/\D/g,'');
+      if(!cleanPhone){
+        if(onResult) onResult({ok:false, error:'شماره نامعتبر'});
+        return;
+      }
+      if(has('sendSms') && this.hasPermission()){
+        try{
+          nat().sendSms(cleanPhone, message);
+          if(onResult) onResult({ok:true, method:'native'});
+          return;
+        }catch(e){ console.warn('Native send failed:', e); }
+      }
+      try{
+        window.location.href = 'sms:' + cleanPhone + '?body=' + encodeURIComponent(message);
+        if(onResult) onResult({ok:true, method:'web'});
+      }catch(e){
+        if(onResult) onResult({ok:false, error:e.message});
+      }
+    },
+
+    sendBulkFast(phones, message){
+      if(!has('sendBulkSmsFast')) return false;
+      const cleanPhones = (phones||[]).map(p => String(p||'').replace(/\D/g,'')).filter(p => p.length >= 10);
+      nat().sendBulkSmsFast(JSON.stringify(cleanPhones), message);
+      return true;
+    },
+
+    sendBulk(phones, message){
+      if(!has('sendBulkSms')) return false;
+      const cleanPhones = (phones||[]).map(p => String(p||'').replace(/\D/g,'')).filter(p => p.length >= 10);
+      nat().sendBulkSms(JSON.stringify(cleanPhones), message);
+      return true;
+    }
+  };
+})();
 </script>
 </body>
 </html>

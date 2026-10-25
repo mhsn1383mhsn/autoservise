@@ -35,6 +35,11 @@ const mp = path.join(root, 'android', 'app', 'src', 'main', 'AndroidManifest.xml
 let m = fs.readFileSync(mp, 'utf8');
 m = m.replace(/android:icon="[^"]*"/, 'android:icon="@mipmap/ic_launcher"')
      .replace(/android:roundIcon="[^"]*"/, 'android:roundIcon="@mipmap/ic_launcher_round"');
+if (!m.includes('android.permission.SEND_SMS')) {
+  m = m.replace(/<application/,
+    '<uses-permission android:name="android.permission.SEND_SMS" />\n' +
+    '    <uses-feature android:name="android.hardware.telephony" android:required="false" />\n\n    <application');
+}
 fs.writeFileSync(mp, m);
 console.log('patch-android: manifest icons OK');
 
@@ -98,11 +103,13 @@ console.log('patch-android: manifest icons OK');
     const pkg = (old.match(/^\s*package\s+[^;]+;/m) || ['package com.autoservice.app;'])[0];
     const code = `${pkg}
 
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -112,6 +119,7 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     private volatile int insTop = 0, insRight = 0, insBottom = 0, insLeft = 0;
+    private SmsBridge smsBridge;
 
     public class InsetsBridge {
         @JavascriptInterface public int top() { return insTop; }
@@ -157,6 +165,9 @@ public class MainActivity extends BridgeActivity {
             @Override public void run() {
                 if (getBridge() != null && getBridge().getWebView() != null) {
                     getBridge().getWebView().addJavascriptInterface(new InsetsBridge(), "AndroidInsets");
+                    // پل پیامک — با نام جدا تا اینترفیس‌های دیگر بازنویسی نشوند
+                    smsBridge = new SmsBridge(MainActivity.this, getBridge().getWebView());
+                    getBridge().getWebView().addJavascriptInterface(smsBridge, "AndroidSms");
                 }
             }
         });
@@ -186,10 +197,34 @@ public class MainActivity extends BridgeActivity {
         });
         ViewCompat.requestApplyInsets(content);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1001 && getBridge() != null && getBridge().getWebView() != null) {
+            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            final WebView wv = getBridge().getWebView();
+            final String js = "window.onSmsPermission&&window.onSmsPermission('" + (granted ? "granted" : "denied") + "')";
+            wv.post(new Runnable() {
+                @Override public void run() { wv.evaluateJavascript(js, null); }
+            });
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (smsBridge != null) smsBridge.destroy();
+        super.onDestroy();
+    }
 }
 `;
     fs.writeFileSync(f, code);
     console.log('patch-android: MainActivity edge-to-edge ->', f);
+
+    // SmsBridge.java کنار MainActivity (همان package)
+    const tpl = fs.readFileSync(path.join(root, 'android-src', 'SmsBridge.java.tpl'), 'utf8');
+    fs.writeFileSync(path.join(path.dirname(f), 'SmsBridge.java'), tpl.replace('__PACKAGE__', pkg));
+    console.log('patch-android: SmsBridge.java ->', path.dirname(f));
   }
 })();
 
