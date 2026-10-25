@@ -513,8 +513,22 @@ body.banner-on .topbar{padding-top:52px;}
 .wizard-progress-bar .wp-line-fill{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,var(--red),var(--red-2));transition:width .4s ease;}
 
 /* دکمه چسبیده به پایین */
-.wizard-sticky-nav{position:sticky;bottom:0;background:linear-gradient(to top,var(--ink) 70%,transparent);padding:14px 0 4px;margin-top:16px;z-index:5;display:flex;gap:10px;}
-.wizard-sticky-nav .btn{flex:1;box-shadow:0 -4px 20px -8px rgba(0,0,0,.7);}
+.wizard-sticky-nav{position:sticky;bottom:0;background:transparent!important;padding:10px 0 20px 0!important;margin-top:10px!important;z-index:5;display:flex;gap:10px;}
+.wizard-sticky-nav .btn{flex:1;box-shadow:none!important;}
+.wizard-sticky-nav .btn-ghost{
+  background:rgba(255,255,255,.05)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+  backdrop-filter:blur(10px)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+}
+.wizard-sticky-nav .btn-primary{
+  background:linear-gradient(135deg,#F0545C 0%,#D62F35 100%)!important;
+  border:none!important;
+}
+[data-theme=light] .wizard-sticky-nav .btn-ghost{
+  background:rgba(0,0,0,.04)!important;
+  border:1px solid rgba(0,0,0,.1)!important;
+}
 
 /* جمع کل زنده */
 .live-total{position:sticky;bottom:0;background:linear-gradient(to top,rgba(11,11,13,.98) 60%,rgba(11,11,13,.85) 85%,transparent);backdrop-filter:blur(6px);padding:12px 14px;margin:12px -16px -16px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:4;}
@@ -1251,15 +1265,300 @@ h1,h2,h3{letter-spacing:-.3px;}
   0%,100%{transform:translateY(0);}
   50%{transform:translateY(-6px);}
 }
-/* ===== safe-area overrides (env()=0 when the WebView is not edge-to-edge) ===== */
+/* ===== edge-to-edge: مقدار --sat/--sab را اندروید (MainActivity) تنظیم می‌کند ===== */
+:root{--sat:0px;--sab:0px;--sal:0px;--sar:0px;}
 html,body{overflow-x:hidden;max-width:100%;}
-body{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px));}
-.topbar{padding-top:calc(18px + env(safe-area-inset-top,0px));}
-body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
-#topBanner{padding-top:calc(11px + env(safe-area-inset-top,0px));}
-.toast{top:calc(16px + env(safe-area-inset-top,0px));max-width:calc(100% - 32px);}
-.modal-overlay{padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));}
-</style>
+body{padding-top:var(--sat);padding-bottom:calc(86px + var(--sab));padding-left:var(--sal);padding-right:var(--sar);box-sizing:border-box;}
+#topBanner{padding-top:calc(11px + var(--sat));}
+.toast{top:calc(16px + var(--sat));max-width:calc(100% - 32px);}
+.tabbar{padding-bottom:calc(6px + var(--sab));padding-left:calc(6px + var(--sal));padding-right:calc(6px + var(--sar));}
+.sheet{padding-bottom:calc(20px + var(--sab));}
+.modal-overlay{padding-top:calc(20px + var(--sat));padding-bottom:calc(20px + var(--sab));}
+/* ══ PERFORMANCE PATCH: بدون blur، انیمیشن سبک‌تر (WebView اندروید) ══ */
+.card,.stat-card,.kpi-card,.income-card,.list-item,.sheet,.toast,.tabbar,.modal-box,.topbar,.qs-results{
+  backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+}
+.card{background:linear-gradient(165deg,rgba(30,30,36,.95) 0%,rgba(20,20,24,.98) 100%) !important;border:1px solid rgba(255,255,255,.08) !important;box-shadow:0 4px 14px rgba(0,0,0,.3) !important;}
+[data-theme=light] .card{background:linear-gradient(165deg,#FFFFFF 0%,#F8F5F0 100%) !important;}
+.list-item{background:linear-gradient(165deg,rgba(35,35,42,.7) 0%,rgba(25,25,30,.8) 100%) !important;border:1px solid rgba(255,255,255,.06) !important;}
+[data-theme=light] .list-item{background:linear-gradient(165deg,rgba(255,255,255,.85) 0%,rgba(250,248,244,.9) 100%) !important;}
+.tabbar{background:rgba(10,10,12,.98) !important;box-shadow:0 -4px 15px rgba(0,0,0,.4) !important;}
+[data-theme=light] .tabbar{background:rgba(255,255,255,.98) !important;box-shadow:0 -4px 15px rgba(0,0,0,.08) !important;}
+.sheet,.modal-box{background:#161619 !important;}
+[data-theme=light] .sheet,[data-theme=light] .modal-box{background:#FFFFFF !important;}
+.list-item,.reminder-item,.pb-item,.bar-row,.card{animation:none !important;}
+.view.active{animation:fadeIn .25s ease-out !important;}
+.sheet-overlay.show .sheet{animation:slideUpSheet .3s cubic-bezier(.2,.8,.2,1) !important;}
+@keyframes slideUpSheet{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.btn,.chip{transition:transform .1s ease !important;}
+*{will-change:auto !important;}
+.btn-primary{background:linear-gradient(135deg,#F0545C 0%,#D62F35 100%) !important;box-shadow:0 4px 12px rgba(214,47,53,.3) !important;}
+.btn-sage{background:linear-gradient(135deg,#5AE896 0%,#3AB877 100%) !important;box-shadow:0 4px 12px rgba(90,232,150,.3) !important;}
+html,body,.view,.sheet,#sheetBody{-webkit-overflow-scrolling:touch !important;}
+
+/* ══ KEYBOARD & VIEWPORT FIX ══ */
+body.keyboard-open .tabbar{display:none!important;}
+body.keyboard-open{padding-bottom:0!important;}
+body.keyboard-open .app{padding-bottom:20px!important;}
+.sheet-overlay{transition:bottom .2s ease;}
+body.keyboard-open .sheet-overlay{bottom:0!important;}
+.field input,.field select,.field textarea{scroll-margin-bottom:100px;}
+input[type="text"],input[type="tel"],input[type="number"],input[type="search"],select,textarea{font-size:16px!important;}
+
+/* ══ INVENTORY FILTERS ══ */
+#invCatFilter{
+  display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;
+  gap:8px!important;padding:4px 4px 12px!important;margin-bottom:8px!important;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+#invCatFilter::-webkit-scrollbar{display:none;}
+#invCatFilter button{
+  flex:0 0 auto!important;background:var(--panel-3)!important;border:1px solid var(--line)!important;
+  border-radius:20px!important;padding:8px 16px!important;font-size:11.5px!important;font-weight:800!important;
+  color:var(--muted)!important;cursor:pointer;transition:all .2s ease!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.1)!important;
+}
+#invCatFilter button.active{
+  background:linear-gradient(155deg,var(--red-2),var(--red))!important;color:#fff!important;
+  border-color:transparent!important;box-shadow:0 4px 12px -4px rgba(214,47,53,.6)!important;
+}
+#invCatFilter button:active{transform:scale(.95)!important;}
+
+/* ══ ULTIMATE LIGHT MODE ══ */
+[data-theme=light]{
+  --ink:#F7F4EE;--panel:#FFFFFF;--panel-2:#FCFAF8;--panel-3:#F2EEE8;
+  --paper:#1C1C1E;--muted:#85817A;--line:rgba(45,35,25,.08);
+  --red:#D62F35;--red-2:#F0545C;--red-bg:rgba(214,47,53,.08);
+  --sage:#10A35A;--sage-bg:rgba(16,163,90,.1);--warn:#D48A00;--warn-bg:rgba(212,138,0,.1);
+  --shadow-soft:0 8px 24px -8px rgba(60,40,20,.08);
+  --shadow-lift:0 4px 12px -4px rgba(60,40,20,.05);
+}
+[data-theme=light] body{
+  background:
+    radial-gradient(800px 500px at 80% -10%,rgba(240,84,92,.08),transparent 60%),
+    radial-gradient(600px 400px at 10% 30%,rgba(255,200,120,.1),transparent 60%),
+    radial-gradient(500px 400px at 90% 80%,rgba(90,232,150,.06),transparent 60%),
+    #F7F4EE!important;
+}
+[data-theme=light] .card{background:#FFF!important;border:1px solid rgba(0,0,0,.04)!important;box-shadow:0 10px 30px -10px rgba(60,40,20,.08)!important;}
+[data-theme=light] .list-item{background:#FFF!important;border:1px solid rgba(0,0,0,.04)!important;box-shadow:0 4px 12px -6px rgba(60,40,20,.04)!important;}
+[data-theme=light] .list-item:hover{background:#FCFAF8!important;border-color:rgba(214,47,53,.2)!important;}
+[data-theme=light] .topbar{background:transparent!important;}
+[data-theme=light] .tabbar{background:rgba(255,255,255,.95)!important;border-top:1px solid rgba(0,0,0,.05)!important;box-shadow:0 -4px 20px -8px rgba(60,40,20,.08)!important;}
+[data-theme=light] .tab-btn{color:#85817A!important;}
+[data-theme=light] .tab-btn.active{color:var(--red)!important;background:rgba(214,47,53,.06)!important;}
+[data-theme=light] .field input,[data-theme=light] .field select,[data-theme=light] .field textarea,
+[data-theme=light] .inp,[data-theme=light] .search-box input,[data-theme=light] .quick-search input{
+  background:#FFF!important;border:1.5px solid rgba(0,0,0,.08)!important;color:var(--paper)!important;
+}
+[data-theme=light] .field input:focus,[data-theme=light] .inp:focus,[data-theme=light] .search-box input:focus{
+  border-color:var(--red-2)!important;box-shadow:0 0 0 4px rgba(240,84,92,.1)!important;
+}
+[data-theme=light] .btn-ghost{background:#FFF!important;border:1px solid rgba(0,0,0,.08)!important;color:var(--paper)!important;}
+[data-theme=light] .seg{background:#F2EEE8!important;}
+[data-theme=light] .seg button.active{background:#FFF!important;color:var(--red)!important;}
+[data-theme=light] .chip,[data-theme=light] #invCatFilter button{background:#FFF!important;border:1px solid rgba(0,0,0,.08)!important;color:var(--paper)!important;}
+[data-theme=light] .chip.active,[data-theme=light] #invCatFilter button.active{background:var(--red)!important;color:#fff!important;border-color:transparent!important;}
+[data-theme=light] .sheet,[data-theme=light] .modal-box{background:#FFF!important;}
+[data-theme=light] .toast{background:#FFF!important;color:var(--paper)!important;}
+[data-theme=light] .stat-card{background:#FFF!important;}
+[data-theme=light] .income-card{background:linear-gradient(135deg,#FFF,#FCFAF8)!important;border:1px solid rgba(16,163,90,.15)!important;}
+[data-theme=light] .li-icon{background:#F7F4EE!important;color:var(--red)!important;}
+
+/* ══ WIZARD FORM ══ */
+.form-section{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;}
+.form-section:focus-within{border-color:rgba(214,47,53,.3);}
+.form-section-title{font-size:12px;font-weight:900;color:var(--red-2);margin-bottom:10px;display:flex;align-items:center;gap:6px;border-bottom:1px dashed var(--line);padding-bottom:8px;}
+.work-row{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:12px;margin-bottom:10px;}
+.work-row.on{border-color:var(--red-2);background:rgba(240,84,92,.04);}
+.work-head{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:800;cursor:pointer;color:var(--paper);width:100%;background:none;border:none;padding:0;}
+.work-state{margin-right:auto;font-size:10px;font-weight:700;color:var(--muted);background:var(--panel-3);padding:4px 10px;border-radius:20px;}
+.work-row.on .work-state{background:var(--red-2);color:#fff;}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.date-quick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.date-quick button{font-size:10.5px;padding:6px 12px;border-radius:20px;background:var(--panel-3);border:1px solid var(--line);color:var(--muted);font-weight:800;cursor:pointer;}
+
+/* ══ CHART ══ */
+#reportChart{width:100%;height:auto;display:block;border-radius:16px;background:linear-gradient(165deg,var(--panel-3),var(--panel-2));margin:10px 0;padding:4px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 4px 16px -4px rgba(0,0,0,.4);}
+
+/* ══ CALENDAR SUMMARY ══ */
+.cal-summary-card{background:linear-gradient(135deg,var(--panel-2),var(--panel-3));border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-align:center;box-shadow:0 4px 12px -4px rgba(0,0,0,.3);}
+.cal-day{min-height:48px;padding:4px 2px;}
+.cal-day .rev-mini{font-size:7px;opacity:.9;}
+
+/* ══ CUSTOM SELECT ══ */
+.custom-select-item{display:flex;align-items:center;justify-content:space-between;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;}
+.custom-select-item:active{transform:scale(.98);background:var(--panel-3);}
+.custom-select-item.active{border-color:var(--red-2);background:rgba(214,47,53,.08);}
+.custom-select-item .csi-label{font-size:13px;font-weight:800;color:var(--paper);}
+.custom-select-item.active .csi-label{color:var(--red-2);}
+.custom-select-item .csi-check{width:22px;height:22px;border-radius:50%;background:var(--red-2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;opacity:0;transform:scale(.5);transition:all .2s;}
+.custom-select-item.active .csi-check{opacity:1;transform:scale(1);}
+
+
+/* ══════════════════════════════════════════════════════════════
+   JALALI CALENDAR FIX (جلوگیری از بیرون‌زدگی)
+   ══════════════════════════════════════════════════════════════ */
+.jcal{position:relative;width:100%;max-width:100%;box-sizing:border-box;}
+.jcal-panel{
+  display:none;margin-top:8px;background:var(--panel);border:1px solid var(--line);
+  border-radius:18px;padding:12px;box-shadow:var(--shadow-soft);
+  width:100%;max-width:100%;box-sizing:border-box;overflow:hidden;
+}
+.jcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;width:100%;box-sizing:border-box;}
+.jcal-d{
+  aspect-ratio:1/1;border:none;border-radius:10px;background:transparent;color:var(--paper);
+  font-weight:700;font-size:12px;cursor:pointer;transition:.12s;min-width:0;min-height:0;padding:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.jcal-wd{font-size:10px;color:var(--muted);font-weight:800;padding:4px 0;min-width:0;}
+.jcal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:13px;font-weight:900;padding:0 2px;}
+.jcal-nav button{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:var(--panel-3);color:var(--paper);font-size:16px;cursor:pointer;flex-shrink:0;}
+.jcal-foot{display:flex;justify-content:center;margin-top:8px;}
+.jcal-foot button{border:1px solid var(--line);background:var(--red-bg);color:var(--red-2);border-radius:20px;padding:6px 16px;font-size:11px;font-weight:800;cursor:pointer;}
+.jcal-trigger{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:linear-gradient(160deg,var(--panel-3),var(--panel-2));border:1px solid var(--line);
+  border-radius:14px;padding:10px 12px;color:var(--paper);cursor:pointer;text-align:right;
+  font-weight:900;font-size:13px;transition:.15s;box-sizing:border-box;
+}
+.jcal-ic{
+  width:36px;height:36px;border-radius:10px;background:linear-gradient(155deg,var(--red-2),var(--red));
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 4px 10px -4px rgba(214,47,53,.6);flex-shrink:0;
+}
+.report-filter{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;width:100%;box-sizing:border-box;}
+.report-filter .field{margin-bottom:0;min-width:0;}
+.report-filter .jcal-trigger{padding:8px 10px;font-size:11px;border-radius:12px;}
+.report-filter .jcal-trigger .jcal-ic{width:30px;height:30px;font-size:14px;}
+.report-filter .jcal-trigger .jcal-hint{font-size:9px;}
+.report-filter .jcal-panel{position:absolute;z-index:100;width:280px;max-width:90vw;left:50%;transform:translateX(-50%);}
+@media (max-width:480px){
+  .report-filter{grid-template-columns:1fr;}
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   CALENDAR GRID FIX (جلوگیری از بیرون‌زدگی روزها)
+   ══════════════════════════════════════════════════════════════ */
+.cal-grid{
+  display:grid !important;
+  grid-template-columns:repeat(7, minmax(0, 1fr)) !important;
+  gap:4px !important;
+  width:100% !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  direction:rtl !important;
+  overflow:hidden !important;
+}
+.cal-wd{
+  font-size:10px !important;
+  color:var(--muted) !important;
+  font-weight:800 !important;
+  padding:4px 0 !important;
+  min-width:0 !important;
+  text-align:center !important;
+  overflow:hidden !important;
+}
+.cal-day{
+  position:relative !important;
+  aspect-ratio:1 / 1 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  border:1px solid var(--line) !important;
+  border-radius:10px !important;
+  background:var(--panel-2) !important;
+  color:var(--paper) !important;
+  font-weight:700 !important;
+  cursor:pointer !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:1px !important;
+  padding:2px !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+.cal-day.empty{
+  border:none !important;
+  background:transparent !important;
+  cursor:default !important;
+  pointer-events:none !important;
+}
+.cal-day .num{
+  font-size:12px !important;
+  line-height:1.1 !important;
+  position:static !important;
+  z-index:1 !important;
+}
+.cal-day .rev-mini{
+  position:absolute !important;
+  top:2px !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  right:auto !important;
+  font-size:6.5px !important;
+  font-weight:900 !important;
+  color:var(--red-2) !important;
+  white-space:nowrap !important;
+  max-width:96% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  line-height:1 !important;
+  opacity:.9 !important;
+}
+.cal-day .cnt{
+  position:absolute !important;
+  bottom:2px !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  font-size:8px !important;
+  font-weight:900 !important;
+  color:var(--red-2) !important;
+  line-height:1 !important;
+}
+.cal-day.has-service{
+  background:var(--red-bg) !important;
+  border-color:rgba(194,39,45,.4) !important;
+}
+.cal-day.has-service.low{background:rgba(194,39,45,.10)!important;}
+.cal-day.has-service.mid{background:rgba(194,39,45,.20)!important;}
+.cal-day.has-service.high{background:rgba(194,39,45,.32)!important;border-color:var(--red-2)!important;}
+.cal-day.fri{color:var(--red-2)!important;}
+.cal-day.today{box-shadow:inset 0 0 0 2px var(--red-2)!important;}
+
+/* اگر داخل کارت است، padding کارت را محدود کن */
+#calGrid, .cal-wrap, #view-calendar .card{
+  max-width:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════
+   FULL-SCREEN EDITOR ENHANCEMENT
+   ══════════════════════════════════════════════════════════════ */
+.sheet-overlay.show .sheet {
+  max-height: 95vh;
+}
+@media (max-width: 640px) {
+  .sheet-overlay.show .sheet {
+    max-height: 95vh;
+    border-radius: 22px 22px 0 0;
+  }
+}
+#fullEditorText:focus {
+  border-color: var(--red-2) !important;
+  box-shadow: 0 0 0 4px rgba(214, 47, 53, 0.15) !important;
+}
+\n</style>
+<script>
+window.__setInsets=function(t,r,b,l){var st=document.documentElement.style;st.setProperty('--sat',t+'px');st.setProperty('--sar',r+'px');st.setProperty('--sab',b+'px');st.setProperty('--sal',l+'px');};
+try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInsets.right(),AndroidInsets.bottom(),AndroidInsets.left());}}catch(e){}
+</script>
 </head>
 <body>
 <div class="app" id="app">
@@ -1279,7 +1578,10 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
         <div class="tag" id="dateChip">—</div>
       </div>
     </div>
-    <button class="btn btn-ghost btn-sm" id="btnTheme" style="width:42px;height:42px;padding:0;font-size:18px" aria-label="تغییر تم">🌙</button>
+    <div style="display:flex; gap:6px;">
+      <button class="btn btn-ghost btn-sm" id="btnTheme" style="width:42px;height:42px;padding:0;font-size:18px" aria-label="تغییر تم">🌙</button>
+      <button class="btn btn-ghost btn-sm" id="btnTopSettings" style="width:42px;height:42px;padding:0;font-size:18px" aria-label="تنظیمات">⚙️</button>
+    </div>
   </div>
 
   <!-- ============ DASHBOARD ============ -->
@@ -1353,12 +1655,10 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
       </div>
       <div class="search-sort-row">
         <span class="ssr-lbl">مرتب‌سازی:</span>
-        <select id="searchSort" class="inp" style="padding:7px 10px;font-size:11px;flex:1">
-          <option value="latest">آخرین سرویس</option>
-          <option value="most">بیشترین سرویس</option>
-          <option value="name">نام مالک</option>
-          <option value="km">کیلومتر</option>
-        </select>
+        <button class="btn btn-ghost btn-sm" id="searchSortBtn" style="flex:1; padding:9px 12px; font-size:11.5px; justify-content:space-between;">
+          <span id="searchSortLabel">آخرین سرویس</span>
+          <span>▼</span>
+        </button>
       </div>
     </div>
 
@@ -1390,12 +1690,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:11px;color:var(--muted);font-weight:700;flex-shrink:0">مرتب:</span>
-        <select id="peopleSort" class="inp" style="padding:7px 10px;font-size:11px;flex:1">
-          <option value="name">نام</option>
-          <option value="debt">بیشترین طلب</option>
-          <option value="recent">آخرین مراجعه</option>
-          <option value="services">تعداد سرویس</option>
-        </select>
+        <button class="btn btn-ghost btn-sm" id="peopleSortBtn" style="flex:1;padding:9px 12px;font-size:11.5px;justify-content:space-between;"><span id="peopleSortLabel">نام</span><span>▼</span></button>
       </div>
     </div>
 
@@ -1421,11 +1716,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
         <button data-pbf="debt">💰 طلب‌کار</button>
         <button data-pbf="clear">✓ بدون بدهی</button>
       </div>
-      <select id="pbSort" class="inp">
-        <option value="name">الفبایی</option>
-        <option value="debt">بیشترین طلب</option>
-        <option value="recent">آخرین مراجعه</option>
-      </select>
+      <button class="btn btn-ghost btn-sm" id="pbSortBtn" style="padding:8px 12px;font-size:11px;justify-content:space-between;min-width:130px;border-radius:12px;"><span id="pbSortLabel">الفبایی</span><span style="font-size:9px;opacity:.6;">▼</span></button>
     </div>
     <div class="row2" style="margin-bottom:12px">
       <button class="btn btn-ghost btn-sm" id="btnPbBackPeople">🔙 بازگشت</button>
@@ -1455,12 +1746,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
     <!-- toolbar -->
     <div class="inv-toolbar">
       <span class="it-lbl">مرتب:</span>
-      <select id="invSort" class="inp">
-        <option value="name">نام</option>
-        <option value="qty">موجودی کم</option>
-        <option value="price">قیمت بالا</option>
-        <option value="profit">بیشترین سود</option>
-      </select>
+      <button class="btn btn-ghost btn-sm" id="invSortBtn" style="flex:1;min-width:120px;padding:8px 10px;font-size:11px;justify-content:space-between;"><span id="invSortLabel">نام</span><span>▼</span></button>
       <button class="it-toggle" id="invLowOnlyToggle">⚠️ فقط کم‌موجود</button>
     </div>
 
@@ -1609,6 +1895,66 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
       </div>
     </div>
 
+    
+    <!-- ============ TEXT TEMPLATES ============ -->
+    <div class="settings-group" data-sg="texts">
+      <div class="settings-group-head">
+        <span class="sg-ic">✍️</span>
+        <span class="sg-title">متن‌های پیش‌فرض پیام‌ها</span>
+        <span class="sg-arrow">›</span>
+      </div>
+      <div class="settings-group-body">
+        <div class="hint" style="margin-top:6px;margin-bottom:10px">
+          متن‌هایی که برای یادآوری سرویس و فاکتور استفاده می‌شوند را می‌توانید شخصی‌سازی کنید. (از متغیرهایی مثل {name}، {plate} و {shop} استفاده کنید)
+        </div>
+        <div class="field">
+          <label>📢 متن یادآوری سرویس</label>
+          <div style="display:flex; gap:8px;">
+            <div id="previewTplReminder" class="inp" style="flex:1; min-height:60px; direction:rtl; text-align:right; line-height:1.8; font-size:11px; padding:10px; overflow:hidden; color:var(--muted); white-space:nowrap; text-overflow:ellipsis; display:flex; align-items:center;">—</div>
+            <button class="btn btn-primary" id="btnEditReminder" aria-label="ویرایش متن یادآوری" style="width:48px; height:48px; padding:0; font-size:18px; flex-shrink:0;">✏️</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>🧾 متن پایین فاکتور</label>
+          <div style="display:flex; gap:8px;">
+            <div id="previewTplInvoice" class="inp" style="flex:1; min-height:48px; direction:rtl; text-align:right; line-height:1.8; font-size:11px; padding:10px; overflow:hidden; color:var(--muted); white-space:nowrap; text-overflow:ellipsis; display:flex; align-items:center;">—</div>
+            <button class="btn btn-primary" id="btnEditInvoice" aria-label="ویرایش متن فاکتور" style="width:48px; height:48px; padding:0; font-size:18px; flex-shrink:0;">✏️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group" data-sg="ads">
+      <div class="settings-group-head">
+        <span class="sg-ic">📢</span>
+        <span class="sg-title">تبلیغات گروهی (روتین)</span>
+        <span class="sg-arrow">›</span>
+      </div>
+      <div class="settings-group-body">
+        <div class="hint" style="margin-top:6px;margin-bottom:10px">متن تبلیغاتی خود را بنویسید. می‌توانید از متغیرهای {shop} و {phone} استفاده کنید.</div>
+        <div class="field">
+          <label>📣 متن پیام تبلیغاتی</label>
+          <div style="display:flex; gap:8px;">
+            <div id="previewTplAd" class="inp" style="flex:1; min-height:60px; direction:rtl; text-align:right; line-height:1.8; font-size:11px; padding:10px; overflow:hidden; color:var(--muted); white-space:nowrap; text-overflow:ellipsis; display:flex; align-items:center;">—</div>
+            <button class="btn btn-primary" id="btnEditAd" aria-label="ویرایش متن تبلیغات" style="width:48px; height:48px; padding:0; font-size:18px; flex-shrink:0;">✏️</button>
+          </div>
+        </div>
+
+        <div class="hint" style="margin-top:6px;margin-bottom:10px">پیام تبلیغاتی دوره‌ای برای همه مشتریان (با تأیید شما).</div>
+        <div class="row2">
+          <div class="field"><label>هر چند روز؟</label><input type="text" inputmode="numeric" id="adInterval" class="inp" placeholder="۳۰"></div>
+          <div class="field"><label>آخرین ارسال</label><input type="text" id="adLastSent" class="inp" disabled style="opacity:0.7" placeholder="هنوز ارسال نشده"></div>
+        </div>
+        <div class="switch-row" style="border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:10px;">
+          <div><div class="s-label">فعال بودن یادآور</div><div class="s-sub">نمایش هشدار در داشبورد</div></div>
+          <label class="switch"><input type="checkbox" id="adActive"><span class="slider"></span></label>
+        </div>
+        <button class="btn btn-primary btn-block btn-sm" id="btnSendAdNow" style="margin-top:12px">🚀 ارسال الآن به همه مشتریان</button>
+        <button class="btn btn-sage btn-block btn-sm" id="btnSaveAds" style="margin-top:8px">💾 ذخیره تنظیمات</button>
+      </div>
+    </div>
+
+
     <div class="version-info">
       <b>اتو سرویس</b> · نسخه ۱.۰.۰<br>
       ساخته‌شده برای تعویض روغنی
@@ -1622,7 +1968,7 @@ body.banner-on .topbar{padding-top:calc(52px + env(safe-area-inset-top,0px));}
     <button class="tab-btn" data-tab="search"><span class="ic">🔍</span>جستجو</button>
     <button class="tab-btn" data-tab="people"><span class="ic">👥</span>اشخاص</button>
     <button class="tab-btn" data-tab="inventory"><span class="ic">📦</span>انبار</button>
-    <button class="tab-btn" data-tab="settings"><span class="ic">⚙️</span>تنظیمات</button>
+    <!-- تنظیمات به نوار بالا منتقل شد -->
   </div>
 
   
@@ -1802,7 +2148,9 @@ const DEFAULT_CATS=[{name:'روغن موتور',unit:'لیتر'},{name:'فیلت
 function defaultQuick(){ return {kms:[3000,5000,7000,10000],works:['شستشوی رادیاتور','شستشوی انژکتور','بالانس چرخ','تعویض لنت']}; }
 function defaultSync(){ return {meta:{services:{},people:{},inventory:{},debts:{}},singles:{},version:0,last:0,dirty:true}; }
 function defaultState(){
-  return { services:[], people:[], inventory:[], debts:[], cats:DEFAULT_CATS.map(c=>Object.assign({},c)), settings:{ displayName:'', theme:'dark', shopName:'اتو سرویس', shopPhone:'', shopAddress:'', reminderKm:3000, reminderDays:180 }, quick:defaultQuick(), sync:defaultSync() };
+  return { services:[], people:[], inventory:[], debts:[], cats:DEFAULT_CATS.map(c=>Object.assign({},c)), settings:{ displayName:'', theme:'dark', shopName:'اتو سرویس', shopPhone:'', shopAddress:'', reminderKm:3000, reminderDays:180,
+      tplReminder: "سلام {name} عزیز 🌹\nیادآوری: موعد سرویس خودرو شما ({plate}) رسیده است.\n⏭️ سرویس بعدی: {km} کیلومتر\n\nمنتظرتون هستیم! 🚗\n{shop}\n📞 {phone}",
+      tplInvoice: "با تشکر از اعتماد شما 🙏"  }, quick:defaultQuick(), sync:defaultSync() };
 }
 const LEGACY=[['oilFilter','فیلتر روغن'],['airFilter','فیلتر هوا'],['cabinFilter','فیلتر کابین'],['vaskazin','واسکازین'],['brakeOil','روغن ترمز']];
 function migrate(r){
@@ -1862,9 +2210,9 @@ function applyStock(works,sign){
   (works||[]).forEach(w=>{
     if(!w.itemId) return;
     const it=STATE.inventory.find(i=>i.id===w.itemId);
-    if(!it) return;                                    // کالا حذف شده → نادیده بگیر
-    let newQty = Math.round((it.qty + sign*(w.qty||0))*100)/100;
-    if(newQty < 0) newQty = 0;                         // انبار هرگز منفی نمی‌شود
+    if(!it) return;
+    let newQty = Math.round((Number(it.qty||0) + sign*Number(w.qty||0))*1000)/1000;
+    if(newQty < 0) newQty = 0;
     it.qty = newQty;
   });
 }
@@ -2096,16 +2444,14 @@ function renderProgressBar(stage){
 function calcLiveTotal(){
   const d = wizard.data;
   let total = 0;
-  // از کالاها/دسته‌ها
   for(const c of STATE.cats){
     const w = d.works[c.name];
     if(!w||!w.on) continue;
     const it = STATE.inventory.find(x=>x.id===w.itemId);
-    const q = parseFloat(w.qty)||0;
+    const q = toDec(w.qty);
     const price = (it && it.price) ? it.price : (toNum(w.price)||0);
-    total += price * (q||1);
+    total += price * (q || 1);
   }
-  // از کارهای اضافی
   if(d.extraSel){
     Object.keys(d.extraSel).forEach(n=>{
       if(d.extraSel[n]){
@@ -2700,12 +3046,14 @@ function renderSearch(query){
   // فیلتر سریع
   if(searchFilter === 'debt'){
     groups = groups.filter(g=>{
-      const pid = g.records[0]?.personId;
-      return pid && personDebt(pid) > 0;
+      const pid = g.records && g.records[0] && g.records[0].personId;
+      if(!pid) return false;
+      return personDebt(pid) > 0;
     });
   } else if(searchFilter === 'reminder'){
     groups = groups.filter(g=>{
-      const last = g.records[0];
+      const last = g.records && g.records[0];
+      if(!last) return false;
       const st = reminderStatus(last);
       return st.s==='overdue' || st.s==='due';
     });
@@ -2932,8 +3280,8 @@ function openPersonSheet(id){
     </div>
     ${phone ? `<div class="person-contact-row">
       <a class="call" href="#" data-call-phone="${escapeHtml(phone)}">📞 تماس</a>
-      <a class="wa" href="#" data-wa-phone="${escapeHtml(phone)}">💬 واتساپ</a>
-      <a class="sms" href="#" id="btnPersonSms">📋 کپی</a>
+      
+      <a class="sms" href="#" id="btnPersonSms">📱 ارسال پیامک</a>
     </div>` : ''}
     <div class="row2">
       <div class="field"><label>نام</label><input type="text" id="pName" value="${escapeHtml(p.name)}"></div>
@@ -2968,7 +3316,7 @@ function openPersonSheet(id){
   if(smsBtn) smsBtn.onclick = (e)=>{
     e.preventDefault();
     const txt = `سلام ${p.name} عزیز 🌹`;
-    copyToClipboard(txt, ok=> showToast(ok?'متن کپی شد':'کپی نشد', ok?'📋':'⚠️'));
+    openMessenger(p.phone, txt, p.name);
   };
 
   // 🔧 تسویه همه
@@ -3181,10 +3529,23 @@ function renderInventory(){
   });
 
   // bind toolbar
-  const sSel = $('invSort');
+  const sSel = $('invSortBtn');
   if(sSel && !sSel._bound){
     sSel._bound = true;
-    sSel.onchange = ()=>{ invSort = sSel.value; renderInventory(); };
+    sSel.onclick = ()=>{
+      const options = [
+        {value:'name', label:'🔤 نام'},
+        {value:'qty', label:'📉 موجودی کم'},
+        {value:'price', label:'💰 قیمت بالا'},
+        {value:'profit', label:'📈 بیشترین سود'}
+      ];
+      openCustomSelect('مرتب‌سازی انبار', options, invSort, (val)=>{
+        invSort = val;
+        const lab = options.find(o=>o.value===val);
+        if($('invSortLabel') && lab) $('invSortLabel').textContent = lab.label;
+        renderInventory();
+      });
+    };
   }
   const lowToggle = $('invLowOnlyToggle');
   if(lowToggle && !lowToggle._bound){
@@ -3247,7 +3608,13 @@ function openItemSheet(id){
   document.querySelectorAll('#sheetBody [data-open-record]').forEach(el=>el.onclick=()=>openRecordSheet(el.dataset.openRecord));
   $('btnSaveItem').onclick=()=>{
     const name=$('iName').value.trim(); if(!name){ showToast('نام کالا را وارد کنید','⚠️'); return; }
-    const qty=Math.round((toDec($('iQty').value)+(it?toDec($('iAdd').value)-toDec($('iSub').value):0))*100)/100;
+    const baseQty = toDec($('iQty').value);
+    let addQty = 0, subQty = 0;
+    if(it){
+      const addEl = $('iAdd'); if(addEl) addQty = toDec(addEl.value);
+      const subEl = $('iSub'); if(subEl) subQty = toDec(subEl.value);
+    }
+    const qty = Math.round((baseQty + addQty - subQty) * 1000) / 1000;
     if(qty<0){ showToast('موجودی نمی‌تواند منفی شود','⚠️'); return; }
     const price=toNum($('iPrice').value);
     const cost=toNum($('iCost').value);
@@ -3510,7 +3877,7 @@ $('btnTheme').addEventListener('click',()=>{
   const next = modes[(modes.indexOf(cur) + 1) % modes.length];
   if(typeof setThemeMode==='function') setThemeMode(next);
   else { STATE.settings.theme = next==='auto'?'dark':next; saveState(); applyTheme(); }
-  const labels = {dark:'تیره', light:'روشن', auto:'خودکار'};
+  const labels = {dark:'تیره 🌙', light:'روشن ☀️', auto:'خودکار 🔄'};
   showToast('تم: '+(labels[next]||next), '🎨');
 });
 $('btnNewPerson').addEventListener('click',openNewPersonSheet);
@@ -3523,10 +3890,20 @@ setTimeout(()=>{
     document.querySelectorAll('#peopleFilterSeg [data-pf]').forEach(x=>x.classList.toggle('active', x===b));
     renderPeople($('peopleSearch')?.value||'');
   });
-  const pSort = $('peopleSort');
-  if(pSort) pSort.onchange = ()=>{
-    peopleSort = pSort.value;
-    renderPeople($('peopleSearch')?.value||'');
+  const pSort = $('peopleSortBtn');
+  if(pSort) pSort.onclick = ()=>{
+    const options = [
+      {value:'name', label:'🔤 نام'},
+      {value:'debt', label:'💰 بیشترین طلب'},
+      {value:'recent', label:'🕓 آخرین مراجعه'},
+      {value:'services', label:'🔢 تعداد سرویس'}
+    ];
+    openCustomSelect('مرتب‌سازی اشخاص', options, peopleSort, (val)=>{
+      peopleSort = val;
+      const lab = options.find(o=>o.value===val);
+      if($('peopleSortLabel') && lab) $('peopleSortLabel').textContent = lab.label;
+      renderPeople($('peopleSearch')?.value||'');
+    });
   };
 }, 100);
 $('btnAddItem').addEventListener('click',()=>openItemSheet(null));
@@ -3536,19 +3913,16 @@ $('invSearchInput').addEventListener('input',renderInventory);
 setTimeout(()=>{
   const pbS = $('pbSearch');
   if(pbS) pbS.addEventListener('input', ()=>{
-    // فیلتر کردن ساده: با رندر مجدد و فیلتر
     const q = normalizeFa(pbS.value.trim());
     const el = $('phonebookList');
     if(!el) return;
     if(!q){ renderPhonebook(); return; }
-    // فیلتر مستقیم
-    const filtered = STATE.people.filter(p=>normalizeFa(p.name).includes(q) || (p.phone||'').includes(toEn(pbS.value)));
+    const qDigits = toEn(pbS.value.trim()).replace(/\D/g,'');
+    const filtered = STATE.people.filter(p=>
+      normalizeFa(p.name||'').includes(q) || (qDigits && toEn(p.phone||'').replace(/\D/g,'').includes(qDigits))
+    );
     if(!filtered.length){ el.innerHTML = `<div class="empty-state"><div class="s">موردی یافت نشد</div></div>`; return; }
-    // استفاده از renderPhonebook با لیست فیلترشده
-    const _orig = STATE.people;
-    STATE.people = filtered;
-    renderPhonebook();
-    STATE.people = _orig;
+    renderPhonebookList(filtered);
   });
   const btnB = $('btnPbBackPeople');
   if(btnB) btnB.onclick = ()=> switchTab('people');
@@ -3557,8 +3931,20 @@ setTimeout(()=>{
     document.querySelectorAll('#pbFilterSeg [data-pbf]').forEach(x=>x.classList.toggle('active', x===b));
     renderPhonebook();
   });
-  const sSel = $('pbSort');
-  if(sSel) sSel.onchange = ()=>{ if(typeof pbSort!=='undefined') pbSort = sSel.value; renderPhonebook(); };
+  const sSel = $('pbSortBtn');
+  if(sSel) sSel.onclick = ()=>{
+    const options = [
+      {value:'name', label:'🔤 الفبایی'},
+      {value:'debt', label:'💰 بیشترین طلب'},
+      {value:'recent', label:'🕓 آخرین مراجعه'}
+    ];
+    openCustomSelect('مرتب‌سازی مخاطبین', options, typeof pbSort!=='undefined'?pbSort:'name', (val)=>{
+      pbSort = val;
+      const lab = options.find(o=>o.value===val);
+      if($('pbSortLabel') && lab) $('pbSortLabel').textContent = lab.label;
+      renderPhonebook();
+    });
+  };
   const bEx = $('btnPbExportCSV');
   if(bEx) bEx.onclick = ()=>{
     const list = STATE.people.slice().sort((a,b)=>a.name.localeCompare(b.name,'fa'));
@@ -3583,6 +3969,18 @@ function switchTab(tab){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+tab).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-tab')===tab));
+  const btnTop = document.getElementById('btnTopSettings');
+  if(btnTop){
+    if(tab === 'settings'){
+      btnTop.style.background = 'var(--red-bg)';
+      btnTop.style.color = 'var(--red-2)';
+      btnTop.style.borderColor = 'rgba(214,47,53,.35)';
+    } else {
+      btnTop.style.background = '';
+      btnTop.style.color = '';
+      btnTop.style.borderColor = '';
+    }
+  }
   if(tab==='new'){ if(!wizard || wizard.stage==='done'){ startWizard(); } else { renderWizard(); } }
   if(tab==='search'){ renderSearch(document.getElementById('searchInput').value); }
   if(tab==='dashboard'){ renderDashboard(); }
@@ -3676,10 +4074,20 @@ setTimeout(()=>{
   });
 
   // مرتب‌سازی
-  const sSort = $('searchSort');
-  if(sSort) sSort.onchange = ()=>{
-    searchSort = sSort.value;
-    renderSearch($('searchInput')?.value||'');
+  const sSort = $('searchSortBtn');
+  if(sSort) sSort.onclick = ()=>{
+    const options = [
+      {value:'latest', label:'🕓 آخرین سرویس'},
+      {value:'most', label:'🔢 بیشترین سرویس'},
+      {value:'name', label:'🔤 نام مالک'},
+      {value:'km', label:'🧭 کیلومتر'}
+    ];
+    openCustomSelect('مرتب‌سازی جستجو', options, searchSort, (val)=>{
+      searchSort = val;
+      const lab = options.find(o=>o.value===val);
+      if($('searchSortLabel') && lab) $('searchSortLabel').textContent = lab.label;
+      renderSearch($('searchInput')?.value||'');
+    });
   };
 
   // پاک تاریخچه
@@ -3960,16 +4368,19 @@ function calcServiceTotal(works){
 function calcServiceBreakdown(works){
   const rows=[];
   (works||[]).forEach(w=>{
-    const it=w.itemId?STATE.inventory.find(x=>x.id===w.itemId):null;
-    // قیمت‌های لحظهٔ ثبت سرویس (ip/ic) اولویت دارند؛ سرویس‌های قدیمی از قیمت فعلی انبار استفاده می‌کنند
-    const sp=(w.ip!==undefined)?(w.ip||0):(it?(it.price||0):0);
-    const sc=(w.ic!==undefined)?(w.ic||0):(it?(it.cost||0):0);
-    let unitPrice=0, unitCost=0, src='';
-    if(sp){ unitPrice=sp; src='کالا'; }
-    if(it||w.ic!==undefined) unitCost=sc;
-    if(!unitPrice&&w.price){ unitPrice=w.price; src='کار'; }
-    const qty=parseFloat(w.qty)||1;
-    rows.push({name:workText(w),qty,unitPrice,unitCost,total:unitPrice*qty,cost:unitCost*qty,src,itemId:w.itemId||'',itemName:it?it.name:(w.name||'')});
+    const it = w.itemId ? STATE.inventory.find(x=>x.id===w.itemId) : null;
+    const sp = (w.ip !== undefined) ? (w.ip||0) : (it ? (it.price||0) : 0);
+    const sc = (w.ic !== undefined) ? (w.ic||0) : (it ? (it.cost||0) : 0);
+    let unitPrice = sp || 0;
+    let unitCost = sc || 0;
+    let src = it ? 'کالا' : '';
+    if(!unitPrice && w.price && !it){ unitPrice = w.price; src = 'کار'; }
+    const qty = parseFloat(w.qty) || 1;
+    rows.push({
+      name: workText(w), qty, unitPrice, unitCost,
+      total: unitPrice * qty, cost: unitCost * qty, src,
+      itemId: w.itemId || '', itemName: it ? it.name : (w.name || '')
+    });
   });
   return rows;
 }
@@ -4134,7 +4545,7 @@ function openInvoiceSheet(recordId){
       ${buildInvoiceHTML(r, invoiceMode)}
       <div class="report-toolbar no-print" style="margin-top:14px">
         <button class="btn btn-primary" id="btnPrintInvoice">🖨️ چاپ</button>
-        <button class="btn wa-btn" id="btnWaInvoice">💬 واتساپ</button>
+        <button class="btn btn-sage" id="btnSmsInvoice">📱 پیامک</button>
       </div>
       <div class="invoice-print-actions no-print" style="margin-top:6px">
         <button class="btn btn-ghost" id="btnPdfInvoice">💾 PDF</button>
@@ -4149,10 +4560,7 @@ function openInvoiceSheet(recordId){
       if(v && v !== r.invoiceNo){ r.invoiceNo = v; saveRecord(r); showToast('شماره فاکتور ذخیره شد','✓'); render(); }
     };
     $('btnPrintInvoice').onclick = ()=>safePrint();
-    $('btnWaInvoice').onclick = ()=>{
-      const p = personOf(r);
-      openWhatsApp(p.phone, buildInvoiceText(r));
-    };
+    $('btnSmsInvoice').onclick = ()=>{ const p = personOf(r); openMessenger(p.phone, buildInvoiceText(r), p.name); };
     $('btnPdfInvoice').onclick = ()=>{ showToast('از پنجره پرینت گزینه «Save as PDF» را انتخاب کنید','💾'); setTimeout(()=>safePrint(), 400); };
     $('btnCopyInvoice').onclick = ()=>{ copyToClipboard(buildInvoiceText(r), ok=> showToast(ok?'فاکتور کپی شد':'کپی نشد', ok?'📋':'⚠️')); };
     $('btnCloseInvoice').onclick = closeSheet;
@@ -4273,8 +4681,7 @@ function openReminderSheet(plateKey){
       ${lastSent?`<div class="sms-last-sent">📤 آخرین ارسال: <b>${lastSent}</b></div>`:''}
 
       <div class="report-toolbar" style="margin-top:10px">
-        <button class="btn wa-btn" id="btnSendWa">💬 واتساپ</button>
-        <button class="btn sms-btn" id="btnSendSms">📋 کپی</button>
+        <button class="btn btn-primary btn-block" id="btnSendSms">📱 ارسال پیامک</button>
       </div>
       <div style="margin-top:12px"><button class="btn btn-primary btn-block" id="btnServiceNow">🔧 ثبت سرویس برای این خودرو</button></div>
     `;
@@ -4286,17 +4693,7 @@ function openReminderSheet(plateKey){
 
     const phone = (person.phone||'').replace(/\D/g,'');
     const waPhone = phone.startsWith('0') ? '98'+phone.slice(1) : phone;
-
-    $('btnSendWa').onclick = ()=>{
-      openWhatsApp(person.phone, txt);
-      markReminderSent(last.id);
-    };
-    $('btnSendSms').onclick = ()=>{
-      copyToClipboard(txt, ok=>{
-        if(ok){ showToast('متن کپی شد','📋'); markReminderSent(last.id); }
-        else showToast('کپی نشد','⚠️');
-      });
-    };
+    $('btnSendSms').onclick = ()=>{ openMessenger(person.phone, txt, person.name); try{ markReminderSent(last.id); }catch(e){} };
     $('btnServiceNow').onclick = ()=>{
       closeSheet();
       wizard = newWizard();
@@ -4356,15 +4753,6 @@ function openImportSheet(){
   };
   $('sheetOverlay').classList.add('show');
 }
-
-/* ══════════════════════════════════════════════════════════════
-   HOOK: renderReminders به داشبورد
-   ══════════════════════════════════════════════════════════════ */
-const _origRenderDashboard = renderDashboard;
-renderDashboard = function(){
-  _origRenderDashboard();
-  try{ renderReminders(); }catch(e){ console.error('reminder render:',e); }
-};
 
 /* ══════════════════════════════════════════════════════════════
    اتصال دکمه ورودی JSON
@@ -4455,50 +4843,71 @@ function computeReport(){
 function drawMonthChart(canvas, months, mode){
   if(!canvas) return;
   mode = mode || 'rev';
+  const now = todayJalali();
+  // 6 recent months
+  let y = now.jy, m = now.jm - 5;
+  while(m < 1){ m += 12; y--; }
+  const fullMonths = [];
+  for(let i=0;i<6;i++){
+    const found = (months||[]).find(x => x.jy === y && x.jm === m);
+    fullMonths.push({ jy:y, jm:m, rev: found?(found.rev||0):0, profit: found?(found.profit||0):0, count: found?(found.count||0):0 });
+    m++; if(m>12){ m=1; y++; }
+  }
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth || 320;
-  const h = 180;
+  const h = 200;
   canvas.width = w*dpr; canvas.height = h*dpr;
   canvas.style.height = h+'px';
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr,dpr);
   ctx.clearRect(0,0,w,h);
-  if(!months.length){
-    ctx.fillStyle = 'rgba(142,142,150,.6)';
-    ctx.font = "12px Vazirmatn, sans-serif";
-    ctx.textAlign = 'center';
-    ctx.fillText('داده‌ای برای نمایش نیست', w/2, h/2);
-    return;
+  const getVal = (mm) => mode==='rev' ? (mm.rev||0) : mode==='profit' ? (mm.profit||0) : (mm.count||0);
+  const colors = mode==='rev' ? ['#F0545C','rgba(240,84,92,0.15)'] : mode==='profit' ? ['#5AE896','rgba(90,232,150,0.15)'] : ['#FFB020','rgba(255,176,32,0.15)'];
+  const pad = {r:15,l:15,t:30,b:40};
+  const chartW = w - pad.r - pad.l;
+  const chartH = h - pad.t - pad.b;
+  const stepX = chartW / 5;
+  const max = Math.max(...fullMonths.map(mm=>getVal(mm)), 1);
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const gy = pad.t + (chartH/4)*i;
+    ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w-pad.r, gy); ctx.stroke();
   }
-  const getVal = (m)=> mode==='rev' ? (m.rev||0) : mode==='profit' ? (m.profit||0) : (m.count||0);
-  const colors = mode==='rev' ? ['#E6434A','#8f1a1f'] : mode==='profit' ? ['#63e2a0','#2e9e5c'] : ['#FFB020','#d68c00'];
-  const pad = {r:10, l:10, t:22, b:32};
-  const cw = (w - pad.r - pad.l) / months.length;
-  const max = Math.max(...months.map(m=>getVal(m)), 1);
-  const barW = Math.min(cw*0.55, 34);
-  months.forEach((m,i)=>{
-    const cx = pad.l + cw*i + cw/2;
-    const val = getVal(m);
-    const barH = (val/max) * (h - pad.t - pad.b);
-    const barY = h - pad.b - barH;
-    const grad = ctx.createLinearGradient(0,barY,0,h-pad.b);
-    grad.addColorStop(0, colors[0]); grad.addColorStop(1, colors[1]);
-    ctx.fillStyle = grad;
-    const x = cx - barW/2, r = 4;
-    ctx.beginPath();
-    ctx.moveTo(x+r,barY); ctx.lineTo(x+barW-r,barY);
-    ctx.quadraticCurveTo(x+barW,barY,x+barW,barY+r);
-    ctx.lineTo(x+barW,h-pad.b); ctx.lineTo(x,h-pad.b); ctx.lineTo(x,barY+r);
-    ctx.quadraticCurveTo(x,barY,x+r,barY); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(245,243,240,.7)';
-    ctx.font = "10px Vazirmatn, sans-serif";
-    ctx.textAlign = 'center';
-    ctx.fillText(MONTHS_FA[m.jm-1].slice(0,4), cx, h-14);
-    if(val>0){
-      ctx.fillStyle = 'rgba(245,243,240,.9)';
-      ctx.font = "9px Vazirmatn, sans-serif";
-      ctx.fillText(mode==='count' ? toFa(val) : shortMoney(val), cx, barY-4);
+  const points = fullMonths.map((mm,i)=>{
+    const val = getVal(mm);
+    return { x: pad.l + stepX*i, y: h - pad.b - (val/max)*chartH, val, data: mm };
+  });
+  const grad = ctx.createLinearGradient(0, pad.t, 0, h-pad.b);
+  grad.addColorStop(0, colors[1]); grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, h-pad.b);
+  points.forEach(p=>ctx.lineTo(p.x, p.y));
+  ctx.lineTo(points[points.length-1].x, h-pad.b);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = colors[0]; ctx.lineWidth = 3; ctx.lineJoin='round'; ctx.lineCap='round';
+  ctx.beginPath();
+  points.forEach((p,i)=>{ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+  ctx.stroke();
+  points.forEach(p=>{
+    ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+    ctx.fillStyle = '#0B0B0D'; ctx.fill();
+    ctx.strokeStyle = colors[0]; ctx.lineWidth = 2.5; ctx.stroke();
+  });
+  ctx.fillStyle = 'rgba(245,243,240,0.9)';
+  ctx.font = "bold 9px Vazirmatn, sans-serif"; ctx.textAlign = 'center';
+  points.forEach(p=>{
+    if(p.val>0){
+      const label = mode==='count' ? toFa(p.val) : (typeof shortMoney==='function' ? shortMoney(p.val) : toFa(p.val));
+      ctx.fillText(label, p.x, p.y - 10);
     }
+  });
+  ctx.fillStyle = 'rgba(160,160,168,0.9)';
+  ctx.font = "10px Vazirmatn, sans-serif";
+  points.forEach((p)=>{
+    const monthName = (MONTHS_FA[p.data.jm-1]||'').slice(0,4);
+    ctx.fillText(monthName, p.x, h-15);
   });
 }
 
@@ -4860,74 +5269,46 @@ function maybeShowDailySummary(){
 function drawKmChart(records){
   const canvas = $('kmChart');
   if(!canvas) return;
-  const sorted = [...records].filter(r=>r.kmCurrent).sort((a,b)=>jalaliDayNum(a.date)-jalaliDayNum(b.date));
+  const sorted = [...(records||[])]
+    .filter(r=>r.kmCurrent && r.date)
+    .sort((a,b)=>jalaliDayNum(a.date)-jalaliDayNum(b.date));
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth || 320;
+  const h = sorted.length < 2 ? 100 : 160;
+  canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+  canvas.style.height = h+'px';
+  const ctx = canvas.getContext('2d');
+  if(!ctx) return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
   if(sorted.length < 2){
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio||1;
-    const w = canvas.clientWidth || 320, h = 100;
-    canvas.width = w*dpr; canvas.height = h*dpr;
-    canvas.style.height = h+'px';
-    ctx.scale(dpr,dpr);
     ctx.fillStyle = 'rgba(142,142,150,.6)';
     ctx.font = "11px Vazirmatn, sans-serif";
     ctx.textAlign = 'center';
     ctx.fillText('برای نمایش نمودار، حداقل ۲ سرویس لازم است', w/2, h/2);
     return;
   }
-  const dpr = window.devicePixelRatio||1;
-  const w = canvas.clientWidth || 320;
-  const h = 160;
-  canvas.width = w*dpr; canvas.height = h*dpr;
-  canvas.style.height = h+'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,w,h);
-
   const pad = {r:10, l:10, t:20, b:28};
   const maxKm = Math.max(...sorted.map(r=>r.kmCurrent));
   const minKm = Math.min(...sorted.map(r=>r.kmCurrent));
   const rangeKm = maxKm - minKm || 1;
   const stepX = (w - pad.r - pad.l) / (sorted.length - 1);
-
-  // خط
-  ctx.strokeStyle = '#E6434A';
-  ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  const points = sorted.map((r,i)=>{
-    const x = pad.l + stepX*i;
-    const y = h - pad.b - ((r.kmCurrent - minKm) / rangeKm) * (h - pad.t - pad.b);
-    return {x,y,r};
-  });
+  const points = sorted.map((r,i)=>({
+    x: pad.l + stepX*i,
+    y: h - pad.b - ((r.kmCurrent - minKm) / rangeKm) * (h - pad.t - pad.b),
+    r
+  }));
+  ctx.strokeStyle = '#E6434A'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.beginPath();
   points.forEach((p,i)=>{ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
   ctx.stroke();
-
-  // نقاط
   points.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,4,0,Math.PI*2);
-    ctx.fillStyle = '#fff';
-    ctx.fill();
-    ctx.strokeStyle = '#E6434A';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    ctx.strokeStyle='#E6434A'; ctx.lineWidth=2; ctx.stroke();
   });
-
-  // برچسب‌های محور
-  ctx.fillStyle = 'rgba(245,243,240,.7)';
-  ctx.font = "9px Vazirmatn, sans-serif";
-  ctx.textAlign = 'center';
-  points.forEach((p,i)=>{
-    if(i===0 || i===points.length-1 || i%2===0){
-      ctx.fillText(fmtJalaliShort(p.r.date).slice(-5), p.x, h-8);
-    }
-  });
-  // حداکثر/حداقل
-  ctx.fillStyle = 'rgba(245,243,240,.9)';
-  ctx.font = "10px Vazirmatn, sans-serif";
-  ctx.textAlign = 'left';
-  ctx.fillText(thousands(maxKm), pad.l, 12);
-  ctx.fillText(thousands(minKm), pad.l, h - pad.b + 12);
+  ctx.fillStyle = 'rgba(245,243,240,.7)'; ctx.font = "9px Vazirmatn, sans-serif"; ctx.textAlign = 'center';
+  points.forEach((p,i)=>{ if(i===0 || i===points.length-1 || i%2===0) ctx.fillText(fmtJalaliShort(p.r.date).slice(-5),p.x,h-8); });
+  ctx.fillStyle = 'rgba(245,243,240,.9)'; ctx.font = "10px Vazirmatn, sans-serif"; ctx.textAlign = 'left';
+  ctx.fillText(thousands(maxKm),pad.l,12); ctx.fillText(thousands(minKm),pad.l,h-pad.b+12);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -4938,6 +5319,39 @@ function openPhonebook(){
 }
 let pbFilter = 'all';
 let pbSort = 'name';
+function renderPhonebookList(list){
+  const el = $('phonebookList');
+  if(!el) return;
+  if(!list.length){
+    el.innerHTML = `<div class="empty-state"><div class="ic">📞</div><div class="t">مخاطبی نیست</div></div>`;
+    return;
+  }
+  const groups = {};
+  list.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','fa')).forEach(p=>{
+    const ch = (p.name||'').trim().charAt(0) || '؟';
+    if(!groups[ch]) groups[ch] = [];
+    groups[ch].push(p);
+  });
+  const sortedKeys = Object.keys(groups).sort((a,b)=>a.localeCompare(b,'fa'));
+  el.innerHTML = sortedKeys.map(ch=>{
+    const items = groups[ch];
+    return `<div class="pb-letter">${escapeHtml(ch)}</div>` + items.map(p=>{
+      const phone = (p.phone||'').replace(/\D/g,'');
+      return `<div class="pb-item">
+        <div class="pb-av">${escapeHtml((p.name||'?').charAt(0))}</div>
+        <div class="pb-nm"><div class="t">${escapeHtml(p.name)}</div><div class="s mono">${toFa(p.phone)}</div></div>
+        <div class="pb-actions"><a class="call" href="#" data-call-phone="${escapeHtml(phone)}" title="تماس">📞</a><a class="sms" href="#" data-pb-sms="${escapeHtml(p.id)}" title="کپی برای پیامک">📋</a></div>
+      </div>`;
+    }).join('');
+  }).join('');
+  el.querySelectorAll('[data-pb-sms]').forEach(a=>a.onclick=(e)=>{
+    e.preventDefault();
+    const p = STATE.people.find(x=>x.id===a.dataset.pbSms);
+    if(!p) return;
+    copyToClipboard(`سلام ${p.name} عزیز 🌹`, ok=>showToast(ok?'متن کپی شد':'کپی نشد', ok?'📋':'⚠️'));
+  });
+}
+
 function renderPhonebook(){
   const el = $('phonebookList');
   if(!el) return;
@@ -4959,72 +5373,12 @@ function renderPhonebook(){
     el.innerHTML = `<div class="empty-state"><div class="ic">📞</div><div class="t">هنوز مخاطبی ثبت نشده</div><div class="s">هنگام ثبت سرویس، اشخاص ساخته می‌شوند</div></div>`;
     return;
   }
-  // گروه‌بندی بر اساس حرف اول
-  const groups = {};
-  people.forEach(p=>{
-    const ch = (p.name||'').trim().charAt(0) || '؟';
-    if(!groups[ch]) groups[ch] = [];
-    groups[ch].push(p);
-  });
-  const sortedKeys = Object.keys(groups).sort((a,b)=>a.localeCompare(b,'fa'));
-  el.innerHTML = sortedKeys.map(ch=>{
-    const list = groups[ch];
-    return `<div class="pb-letter">${escapeHtml(ch)}</div>` + list.map(p=>{
-      const phone = (p.phone||'').replace(/\D/g,'');
-      const waPhone = phone.startsWith('0')?'98'+phone.slice(1):phone;
-      return `<div class="pb-item">
-        <div class="pb-av">${escapeHtml((p.name||'?').charAt(0))}</div>
-        <div class="pb-nm">
-          <div class="t">${escapeHtml(p.name)}</div>
-          <div class="s mono">${toFa(p.phone)}</div>
-        </div>
-        <div class="pb-actions">
-          <a class="call" href="#" data-call-phone="${escapeHtml(phone)}" title="تماس">📞</a>
-          ${phone?`<a class="wa" href="#" data-wa-phone="${escapeHtml(phone)}" title="واتساپ">💬</a>`:''}
-          <a class="sms" href="#" data-pb-sms="${escapeHtml(p.id)}" title="کپی برای پیامک">📋</a>
-        </div>
-      </div>`;
-    }).join('');
-  }).join('');
-  el.querySelectorAll('[data-pb-sms]').forEach(a=>a.onclick=(e)=>{
-    e.preventDefault();
-    const pid = a.dataset.pbSms;
-    const p = STATE.people.find(x=>x.id===pid);
-    if(!p) return;
-    const txt = `سلام ${p.name} عزیز 🌹`;
-    copyToClipboard(txt, ok=> showToast(ok?'متن کپی شد':'کپی نشد', ok?'📋':'⚠️'));
-  });
+  renderPhonebookList(people);
 }
 
 /* ══════════════════════════════════════════════════════════════
    HOOKS
    ══════════════════════════════════════════════════════════════ */
-// بعد از رندر داشبورد، بنر آپدیت شود
-const _origRenderDashboard2 = renderDashboard;
-renderDashboard = function(){
-  _origRenderDashboard2();
-  try{ renderReminders(); }catch(e){ console.error('reminders:', e); }
-  try{ updateTopBanner(); }catch(e){}
-  // انیمیشن اعداد
-  try{
-    ['statVehicles','statToday','statTotal'].forEach(id=>{
-      const el = $(id);
-      if(!el) return;
-      el.classList.remove('animate');
-      void el.offsetWidth;
-      el.classList.add('animate');
-    });
-  }catch(e){}
-};
-
-// بعد از init، خلاصه روزانه
-const _origInit = init;
-init = function(){
-  _origInit();
-  bindTopBanner();
-  setTimeout(()=>{ try{ maybeShowDailySummary(); }catch(e){} }, 800);
-};
-
 // دکمه دفترچه تلفن
 setTimeout(()=>{
   const btn = $('btnPhonebook');
@@ -5108,7 +5462,7 @@ function renderCalendar(){
     }
     html += `<div class="${cls.join(' ')}" data-cal-day="${d}" title="${st.rev?money(st.rev):''}">
       <span class="num">${toFa(d)}</span>
-      ${st.rev>0?`<span class="rev-mini">${shortMoney(st.rev)}</span>`:''}
+      ${st.rev>0?`<span class="rev-mini">${(function(n){try{var s=shortMoney(n);return s.replace(/میلیون/g,'م').replace(/هزار/g,'ه').replace(/\s+/g,'');}catch(e){return '';}})(st.rev)}</span>`:''}
       ${st.count>0?`<span class="cnt">${toFa(st.count)}</span>`:''}
     </div>`;
   }
@@ -5455,7 +5809,13 @@ function applyThemeMode(){
   document.documentElement.setAttribute('data-theme', effective);
   const m = document.querySelector('meta[name=theme-color]');
   if(m) m.setAttribute('content', effective==='light'?'#F5F1EB':'#0B0B0D');
-  const b = $('btnTheme'); if(b) b.textContent = effective==='light'?'🌙':'☀️';
+  try{ if(window.AndroidInsets && AndroidInsets.setLightBars) AndroidInsets.setLightBars(effective==='light'); }catch(e){}
+  const b = $('btnTheme');
+  if(b){
+    if(mode === 'dark') b.textContent = '☀️';
+    else if(mode === 'light') b.textContent = '🌙';
+    else b.textContent = '🔄';
+  }
   document.querySelectorAll('#themeSeg [data-theme]').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.theme === mode);
   });
@@ -5513,8 +5873,71 @@ function openRestoreSheet(){
   });
   $('sheetOverlay').classList.add('show');
 }
+// ══════════════════════════════════════════════════════════════
+// FULL-SCREEN TEXT EDITOR (ویرایشگر تمام‌صفحه متن)
+// ══════════════════════════════════════════════════════════════
+function openTextEditor(title, currentText, placeholder, variablesHint, onSave) {
+  $('sheetTitle').textContent = title;
+  const body = $('sheetBody');
+  body.innerHTML = `
+    <div class="hint" style="margin-bottom:12px;line-height:1.8">${escapeHtml(variablesHint || '')}</div>
+    <textarea id="fullEditorText"
+      style="width:100%; min-height:50vh; box-sizing:border-box; background:var(--panel-3); border:1px solid var(--line); border-radius:14px; padding:14px; color:var(--paper); font-family:'Vazirmatn',sans-serif; font-size:13px; line-height:1.9; direction:rtl; text-align:right; resize:vertical; white-space:pre-wrap;"
+      placeholder="${escapeHtml(placeholder || '')}">${escapeHtml(currentText || '')}</textarea>
+    <div class="hint" style="text-align:center; margin-top:10px; font-size:10.5px;">💡 می‌توانید از متغیرها استفاده کنید. این متغیرها هنگام ارسال جایگزین می‌شوند.</div>
+    <div class="wizard-sticky-nav" style="margin-top:16px;">
+      <button class="btn btn-ghost" id="editorCancel" type="button">انصراف</button>
+      <button class="btn btn-sage" id="editorSave" type="button">✓ ذخیره</button>
+    </div>`;
+  $('sheetOverlay').classList.add('show');
+  setTimeout(() => {
+    const ta = $('fullEditorText');
+    if(ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+  }, 200);
+  $('editorSave').onclick = () => {
+    const ta = $('fullEditorText');
+    const finalText = ta ? ta.value.trim() : '';
+    if(!finalText) { showToast('متن خالی است', '⚠️'); return; }
+    onSave(finalText);
+    closeSheet();
+  };
+  $('editorCancel').onclick = closeSheet;
+}
+
 function bindNewSettings(){
   bindSettingsAccordion();
+  const previewReminder = $('previewTplReminder');
+  const previewInvoice = $('previewTplInvoice');
+  const previewAd = $('previewTplAd');
+  const updatePreviews = () => {
+    const preview = (value) => {
+      const t = value || '—';
+      return t.replace(/\\n/g, ' ').slice(0, 80) + (t.length > 80 ? '...' : '');
+    };
+    if(previewReminder) previewReminder.textContent = preview((STATE.settings || {}).tplReminder);
+    if(previewInvoice) previewInvoice.textContent = preview((STATE.settings || {}).tplInvoice);
+    if(previewAd) previewAd.textContent = preview((STATE.settings || {}).tplAd);
+  };
+  updatePreviews();
+  const bindTextEditor = (id, title, key, placeholder, hint, successMessage) => {
+    const btn = $(id);
+    if(btn && !btn._textEditorBound) {
+      btn._textEditorBound = true;
+      btn.onclick = () => openTextEditor(title, (STATE.settings || {})[key] || '', placeholder, hint, (newText) => {
+        if(!STATE.settings) STATE.settings = {};
+        STATE.settings[key] = newText;
+        saveState();
+        updatePreviews();
+        showToast(successMessage, '✓');
+      });
+    }
+  };
+  bindTextEditor('btnEditReminder', '✏️ ویرایش متن یادآوری', 'tplReminder', 'سلام {name} عزیز...',
+    '📌 متغیرهای قابل استفاده: {name} (نام مشتری)، {plate} (پلاک)، {shop} (نام مغازه)، {phone} (تلفن مغازه)', 'متن یادآوری ذخیره شد');
+  bindTextEditor('btnEditInvoice', '✏️ ویرایش متن فاکتور', 'tplInvoice', 'با تشکر از اعتماد شما 🙏',
+    '📌 این متن در پایین فاکتور چاپی نمایش داده می‌شود.', 'متن فاکتور ذخیره شد');
+  bindTextEditor('btnEditAd', '✏️ ویرایش متن تبلیغات', 'tplAd', 'سلام به همه مشتریان عزیز 🌹...',
+    '📌 متغیرهای قابل استفاده: {shop} (نام مغازه)، {phone} (تلفن مغازه)', 'متن تبلیغات ذخیره شد');
   const seg = $('themeSeg');
   if(seg && !seg._bound){ seg._bound = true; seg.querySelectorAll('[data-theme]').forEach(btn=>btn.onclick=()=>{ setThemeMode(btn.dataset.theme); showToast('حالت نمایش ذخیره شد','🎨'); }); applyThemeMode(); }
   const btnBk = $('btnBackupNow');
@@ -5528,18 +5951,24 @@ function bindNewSettings(){
     window.setSyncStatus = function(t){ orig(t); updateSyncBadge(); };
   }
 }
-if(typeof renderSettings === 'function'){
-  const _origRenderSettings = renderSettings;
-  renderSettings = function(){ _origRenderSettings(); try{ bindNewSettings(); }catch(e){} };
-}
 setTimeout(()=>{ try{ maybeAutoBackup(); renderBackupInfo(); }catch(e){} }, 1500);
 
 
 
 /* ══ REMINDER IMPROVEMENTS JS ══ */
-let reminderTemplate = 'friendly';
+var reminderTemplate = 'friendly';
 function buildReminderTextByTemplate(rec, plate, person, template){
   const s = STATE.settings || {};
+  const replaceVars = (text) => (text||'')
+    .replace(/{name}/g, (person && person.name) || '')
+    .replace(/{plate}/g, plateDisplay(plate) || '')
+    .replace(/{km}/g, rec && rec.kmNext ? thousands(rec.kmNext) : '—')
+    .replace(/{shop}/g, s.shopName || 'اتو سرویس')
+    .replace(/{phone}/g, s.shopPhone || '—');
+  if((!template || template === 'friendly') && s.tplReminder){
+    return replaceVars(s.tplReminder);
+  }
+
   template = template || reminderTemplate;
   if(template === 'short') return `سلام ${person.name} عزیز 🌹\nموعد سرویس ${plateDisplay(plate)} رسیده.\n📞 ${s.shopPhone||'—'}`;
   if(template === 'formal') return `با سلام،\nمشتری گرامی ${person.name}\nبه استحضار می‌رساند موعد سرویس خودرو شما با پلاک ${plateDisplay(plate)} فرا رسیده است.\n${rec&&rec.kmNext?`کیلومتر سرویس بعدی: ${thousands(rec.kmNext)}\n`:''}خواهشمند است جهت رزرو وقت با ما تماس حاصل فرمایید.\n${s.shopName||'اتو سرویس'}\n📞 ${s.shopPhone||'—'}`;
@@ -5586,10 +6015,10 @@ function openWhatsApp(phone, text){
   const cleanPhone = String(phone||'').replace(/\D/g,'');
   if(!cleanPhone){ showToast('شماره ثبت نشده','⚠️'); return; }
   const waPhone = cleanPhone.startsWith('0') ? '98'+cleanPhone.slice(1) : cleanPhone;
-  if(window.Android && typeof window.Android.openWhatsApp === 'function'){
-    try{ window.Android.openWhatsApp(waPhone, text||''); return; }catch(e){ console.warn('openWhatsApp failed', e); }
+  if(window.Android && typeof window.Android.openWhatsApp==='function'){
+    try{ window.Android.openWhatsApp(waPhone, text||''); return; }catch(e){}
   }
-  window.location.href = 'https://wa.me/'+waPhone+'?text='+encodeURIComponent(text||'');
+  window.location.href = 'whatsapp://send?phone='+waPhone+'&text='+encodeURIComponent(text||'');
 }
 function openCall(phone){
   const cleanPhone = String(phone||'').replace(/\D/g,'');
@@ -5660,30 +6089,6 @@ function animateCount(el, target, duration, formatter){
   };
   requestAnimationFrame(tick);
 }
-if(typeof renderDashboard === 'function'){
-  const _origRD = renderDashboard;
-  renderDashboard = function(){
-    _origRD();
-    ['statVehicles','statToday','statTotal'].forEach(id=>{
-      const el = $(id); if(!el) return;
-      el.classList.remove('num-pop'); void el.offsetWidth; el.classList.add('num-pop');
-    });
-    const incEl = $('incomeToday');
-    if(incEl){ incEl.classList.remove('num-pop'); void incEl.offsetWidth; incEl.classList.add('num-pop'); }
-  };
-}
-if(typeof renderReports === 'function'){
-  const _origRR = renderReports;
-  renderReports = function(){
-    _origRR();
-    setTimeout(()=>{
-      document.querySelectorAll('.kpi-card .v').forEach((el,i)=>{
-        el.classList.remove('num-pop'); void el.offsetWidth;
-        setTimeout(()=>el.classList.add('num-pop'), i*60);
-      });
-    }, 40);
-  };
-}
 setTimeout(()=>{ try{ bindRipple(); }catch(e){} }, 300);
 
 
@@ -5697,6 +6102,326 @@ document.addEventListener('click', function delegatedWaCall(e){
 });
 
 // لایسنس موقتاً غیرفعال است؛ برنامه مستقیم اجرا می‌شود.
+
+function openCustomSelect(title, options, currentValue, onSelect){
+  $('sheetTitle').textContent = title;
+  const body = $('sheetBody');
+  body.innerHTML = options.map(opt=>{
+    const isActive = opt.value === currentValue;
+    return `<div class="custom-select-item ${isActive?'active':''}" data-select-val="${opt.value}">
+      <div class="csi-label">${opt.label}</div>
+      <div class="csi-check">✓</div>
+    </div>`;
+  }).join('');
+  body.querySelectorAll('[data-select-val]').forEach(el=>{
+    el.onclick = ()=>{ onSelect(el.dataset.selectVal); closeSheet(); };
+  });
+  $('sheetOverlay').classList.add('show');
+}
+
+
+function openMessenger(phone, text, personName){
+  openMessagePreview(phone, text, personName);
+}
+
+
+function setupKeyboardFix(){
+  const root = document.documentElement;
+  let initialHeight = root.clientHeight;
+  window.addEventListener('resize', ()=>{
+    if(root.clientHeight < initialHeight * 0.75) document.body.classList.add('keyboard-open');
+    else document.body.classList.remove('keyboard-open');
+  });
+  document.addEventListener('focusin', (e)=>{
+    const el = e.target;
+    if(!el || !/INPUT|TEXTAREA|SELECT/i.test(el.tagName)) return;
+    setTimeout(()=>{ try{ el.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){} }, 300);
+  });
+}
+setupKeyboardFix();
+
+
+(function(){
+  const btnTopSettings = document.getElementById('btnTopSettings');
+  if(btnTopSettings) btnTopSettings.onclick = ()=>switchTab('settings');
+})();
+
+
+function exportMonthCSV(){
+  const list = STATE.services.filter(r=>r.date && r.date.jy===calYear && r.date.jm===calMonth)
+    .sort((a,b)=> jalaliDayNum(a.date) - jalaliDayNum(b.date));
+  if(!list.length){ showToast('سرویسی در این ماه نیست','⚠️'); return; }
+  const rows = [['ردیف','تاریخ','پلاک','مشتری','تلفن','کارها','کیلومتر','درآمد','هزینه','سود','پرداخت'].join(',')];
+  let totalRev=0,totalCost=0,totalProfit=0;
+  list.forEach((r,i)=>{
+    const bd = calcServiceBreakdown(r.works);
+    const rev = bd.reduce((a,x)=>a+(x.total||0),0);
+    const cost = bd.reduce((a,x)=>a+(x.cost||0),0);
+    totalRev+=rev; totalCost+=cost; totalProfit+=rev-cost;
+    const p = personOf(r);
+    const esc = s=>`"${String(s||'').replace(/"/g,'""').replace(/\n/g,' ')}"`;
+    rows.push([i+1,esc(fmtJalaliShort(r.date)),esc(plateDisplay(r.plate)),esc(p.name),esc(p.phone),esc(r.works.map(workText).join(' | ')),r.kmCurrent||0,rev,cost,rev-cost,esc(payText(r.payment))].join(','));
+  });
+  rows.push(''); rows.push(['','','','','','','جمع کل',totalRev,totalCost,totalProfit,''].join(','));
+  const blob = new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`report-${calYear}-${pad2(calMonth)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('فایل اکسل دانلود شد','📥');
+}
+function generateMonthReport(){
+  const list = STATE.services.filter(r=>r.date && r.date.jy===calYear && r.date.jm===calMonth);
+  if(!list.length){ showToast('سرویسی در این ماه نیست','⚠️'); return; }
+  let totalRev=0, totalCost=0, totalProfit=0;
+  const customerStats = {};
+  list.forEach(r=>{
+    const bd = calcServiceBreakdown(r.works);
+    const rev = bd.reduce((a,x)=>a+(x.total||0),0);
+    const cost = bd.reduce((a,x)=>a+(x.cost||0),0);
+    totalRev+=rev; totalCost+=cost; totalProfit+=rev-cost;
+    const p = personOf(r);
+    if(p.id){ if(!customerStats[p.id]) customerStats[p.id]={name:p.name,count:0,rev:0}; customerStats[p.id].count++; customerStats[p.id].rev+=rev; }
+  });
+  const monthName = `${MONTHS_FA[calMonth-1]} ${toFa(calYear)}`;
+  let txt = `📊 گزارش کامل ماه ${monthName}\n`;
+  txt += `درآمد: ${money(totalRev)}\nهزینه: ${money(totalCost)}\nسود: ${money(totalProfit)}\nسرویس: ${toFa(list.length)}\nمشتری: ${toFa(Object.keys(customerStats).length)}\n`;
+  txt += `📅 ${fmtJalali(todayJalali())}\n🏪 ${STATE.settings.shopName||'اتو سرویس'}`;
+  $('sheetTitle').textContent = '📊 گزارش ماهانه';
+  $('sheetBody').innerHTML = `<div class="sms-preview" style="max-height:60vh;white-space:pre-wrap">${escapeHtml(txt)}</div>
+    <div class="report-toolbar" style="margin-top:12px"><button class="btn btn-sage" id="copyMonthReport">📋 کپی</button>
+    <button class="btn btn-ghost" id="closeMonthReport">بستن</button></div>`;
+  $('copyMonthReport').onclick = ()=>copyToClipboard(txt, ok=>ok&&showToast('کپی شد','📋'));
+  $('closeMonthReport').onclick = closeSheet;
+  $('sheetOverlay').classList.add('show');
+}
+
+
+let currentSendData = null;
+function openMessagePreview(phone, text, personName){
+  const cleanPhone = String(phone||'').replace(/\D/g,'');
+  if(!cleanPhone){ showToast('شماره ثبت نشده','⚠️'); return; }
+  $('sheetTitle').textContent = '✉️ پیش‌نمایش پیام';
+  const body = $('sheetBody');
+  body.innerHTML = `
+    <div class="hint" style="text-align:center;margin-bottom:14px;line-height:1.8">
+      📱 گیرنده: <b>${escapeHtml(personName || 'مشتری')}</b><br>
+      <span class="mono" style="font-size:12px">${toFa(cleanPhone)}</span>
+    </div>
+    <div class="field">
+      <label>✏️ متن پیام (قابل ویرایش)</label>
+      <textarea id="previewText" class="inp" style="min-height:140px; direction:rtl; text-align:right; line-height:1.9; font-size:13px; padding:12px; white-space:pre-wrap;">${escapeHtml(text||'')}</textarea>
+    </div>
+    <div class="hint" style="text-align:center;margin-top:8px;margin-bottom:14px;font-size:10.5px">
+      💡 می‌توانید متن بالا را قبل از ارسال تغییر دهید.
+    </div>
+    <div style="display:grid;gap:8px;">
+      <button class="btn btn-primary btn-block btn-lg" id="previewSms">📱 ارسال پیامک (SMS)</button>
+      <button class="btn btn-ghost btn-block" id="previewCopy">📋 فقط کپی متن</button>
+      <button class="btn btn-ghost btn-block" id="previewCancel">❌ انصراف</button>
+    </div>`;
+  $('previewSms').onclick = ()=>{
+    const finalText = ($('previewText').value||'').trim();
+    if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
+    if(window.Android && typeof window.Android.sendSms==='function'){
+      try{ window.Android.sendSms(cleanPhone, finalText); showToast('پیامک ارسال شد','✅'); closeSheet(); return; }catch(e){}
+    }
+    window.location.href = 'sms:'+cleanPhone+'?body='+encodeURIComponent(finalText);
+    showToast('اپلیکیشن پیامک باز شد','📱');
+    setTimeout(closeSheet, 800);
+  };
+  $('previewCopy').onclick = ()=>{
+    const finalText = ($('previewText').value||'').trim();
+    copyToClipboard(finalText, ok=>{ if(ok) showToast('متن کپی شد','📋'); closeSheet(); });
+  };
+  $('previewCancel').onclick = closeSheet;
+  $('sheetOverlay').classList.add('show');
+}
+function sendVia(method){
+  if(!currentSendData) return;
+  const { phone, text } = currentSendData;
+  if(method==='sms'){
+    if(window.Android && typeof window.Android.sendSms==='function'){
+      try{ window.Android.sendSms(phone, text); showToast('پیامک ارسال شد','✅'); closeSheet(); currentSendData=null; return; }catch(e){}
+    }
+    window.location.href = 'sms:'+phone+'?body='+encodeURIComponent(text);
+    showToast('اپلیکیشن پیامک باز شد','📱');
+  } else if(method==='wa'){
+    const waPhone = phone.startsWith('0') ? '98'+phone.slice(1) : phone;
+    if(window.Android && typeof window.Android.openWhatsApp==='function'){
+      try{ window.Android.openWhatsApp(waPhone, text); closeSheet(); currentSendData=null; return; }catch(e){}
+    }
+    window.location.href = 'whatsapp://send?phone='+waPhone+'&text='+encodeURIComponent(text);
+    showToast('واتساپ باز شد','💬');
+  }
+  closeSheet();
+  currentSendData = null;
+}
+function openBulkPreview(text, people){
+  $('sheetTitle').textContent = '📢 ارسال گروهی';
+  const body = $('sheetBody');
+  body.innerHTML = `
+    <div class="hint" style="text-align:center;margin-bottom:12px;line-height:1.8">
+      📱 این پیام برای <b>${toFa(people.length)}</b> مشتری ارسال خواهد شد.
+    </div>
+    <div class="field">
+      <label>✏️ متن پیام (قابل ویرایش)</label>
+      <textarea id="bulkPreviewText" class="inp" style="min-height:140px; direction:rtl; text-align:right; line-height:1.9; font-size:13px; padding:12px; white-space:pre-wrap;">${escapeHtml(text||'')}</textarea>
+    </div>
+    <div class="hint" style="text-align:center;margin-top:8px;margin-bottom:14px;font-size:10.5px">
+      💡 می‌توانید متن بالا را قبل از ارسال ویرایش کنید.
+    </div>
+    <div style="display:grid;gap:8px;">
+      <button class="btn btn-primary btn-block btn-lg" id="bulkSmsAll">📱 ارسال خودکار به همه</button>
+      <button class="btn btn-sage btn-block btn-lg" id="bulkSmsOne">📲 ارسال یکی‌یکی (لیست)</button>
+      <button class="btn btn-ghost btn-block" id="bulkCopyList">📋 کپی متن و لیست شماره‌ها</button>
+      <button class="btn btn-ghost btn-block" id="bulkCancel">❌ انصراف</button>
+    </div>`;
+  const getText = ()=> ($('bulkPreviewText').value||'').trim();
+  $('bulkSmsAll').onclick = ()=>{
+    const finalText = getText();
+    if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
+    if(!confirm('ارسال پیامک به '+toFa(people.length)+' مشتری؟')) return;
+    if(!STATE.settings) STATE.settings={};
+    STATE.settings.adLastSent = Date.now(); saveState();
+    if(window.Android && typeof window.Android.sendBulkSms==='function'){
+      const numbers = people.map(p=>String(p.phone||'').replace(/\D/g,''));
+      try{ window.Android.sendBulkSms(JSON.stringify(numbers), finalText); showToast(toFa(numbers.length)+' پیامک در حال ارسال...','🚀'); closeSheet(); return; }catch(e){}
+    }
+    showToast('پل ارسال خودکار موجود نیست، از حالت یکی‌یکی استفاده کنید','⚠️');
+  };
+  $('bulkSmsOne').onclick = ()=>{
+    const finalText = getText();
+    if(!finalText){ showToast('متن پیام خالی است','⚠️'); return; }
+    if(!STATE.settings) STATE.settings={};
+    STATE.settings.adLastSent = Date.now(); saveState();
+    body.innerHTML = `
+      <div class="hint" style="text-align:center;margin-bottom:12px;line-height:1.8">روی هر نام کلیک کنید تا پیامک برای او ارسال شود.</div>
+      ${people.map(p=>{
+        const phone = String(p.phone||'').replace(/\D/g,'');
+        return `<div class="custom-select-item" data-bulk-person="${escapeHtml(phone)}" style="cursor:pointer">
+          <div class="csi-label">${escapeHtml(p.name||'')} <span class="mono" style="font-size:10px;color:var(--muted);margin-right:8px">${toFa(p.phone||'')}</span></div>
+          <div class="csi-check" style="opacity:1;transform:scale(1);background:var(--sage)">📱</div>
+        </div>`;
+      }).join('')}
+      <button class="btn btn-ghost btn-block" id="bulkDone" style="margin-top:14px">✓ اتمام ارسال</button>`;
+    body.querySelectorAll('[data-bulk-person]').forEach(el=>{
+      el.onclick = ()=>{
+        const phone = el.dataset.bulkPerson;
+        if(window.Android && typeof window.Android.sendSms==='function'){
+          try{ window.Android.sendSms(phone, finalText); el.style.opacity='0.4'; return; }catch(e){}
+        }
+        window.location.href = 'sms:'+phone+'?body='+encodeURIComponent(finalText);
+        setTimeout(()=>{ el.style.opacity='0.4'; }, 500);
+      };
+    });
+    $('bulkDone').onclick = ()=>{ closeSheet(); try{renderAll();}catch(e){} };
+  };
+  $('bulkCopyList').onclick = ()=>{
+    const finalText = getText();
+    const listText = finalText+'\n\n━━━━━━━━━━━━━━\n📋 لیست مشتریان:\n'+people.map(p=>`${p.name}: ${p.phone}`).join('\n');
+    copyToClipboard(listText, ok=>{ if(ok) showToast('متن و لیست کپی شد','📋'); });
+  };
+  $('bulkCancel').onclick = closeSheet;
+  $('sheetOverlay').classList.add('show');
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   HOOKS تجمیعی — اجرای یک‌باره و بدون wrapperهای تودرتو
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  const _baseRenderDashboard = renderDashboard;
+  renderDashboard = function(){
+    try{ _baseRenderDashboard(); }catch(e){ console.error('base dashboard:',e); return; }
+    try{ renderReminders(); }catch(e){ console.warn('reminders:',e); }
+    try{ updateTopBanner(); }catch(e){ console.warn('banner:',e); }
+    try{
+      ['statVehicles','statToday','statTotal'].forEach(id=>{
+        const el=$(id); if(!el) return;
+        el.classList.remove('animate','num-pop'); void el.offsetWidth; el.classList.add('animate','num-pop');
+      });
+      const incEl=$('incomeToday');
+      if(incEl){ incEl.classList.remove('num-pop'); void incEl.offsetWidth; incEl.classList.add('num-pop'); }
+    }catch(e){}
+    try{ _renderAdBannerIfNeeded(); }catch(e){ console.warn('ad banner:',e); }
+  };
+  const _baseRenderReports = renderReports;
+  renderReports = function(){
+    try{ _baseRenderReports(); }catch(e){ console.error('reports:',e); return; }
+    setTimeout(()=>{
+      document.querySelectorAll('.kpi-card .v').forEach((el,i)=>{
+        el.classList.remove('num-pop'); void el.offsetWidth;
+        setTimeout(()=>el.classList.add('num-pop'),i*60);
+      });
+    },40);
+  };
+  const _baseRenderSettings = renderSettings;
+  renderSettings = function(){
+    try{ _baseRenderSettings(); }catch(e){ console.error('settings:',e); return; }
+    try{ bindNewSettings(); }catch(e){ console.warn('settings binding:',e); }
+    setTimeout(()=>{ try{ _bindAdsExtra(); }catch(e){} },50);
+  };
+  function _renderAdBannerIfNeeded(){
+    const s=STATE.settings||{};
+    const exist=document.getElementById('adBannerDash');
+    if(!s.adActive||!s.tplAd){ if(exist) exist.remove(); return; }
+    const now=Date.now(), intervalMs=(s.adInterval||30)*86400000, lastSent=s.adLastSent||0;
+    if(now-lastSent<intervalMs){ if(exist) exist.remove(); return; }
+    const host=document.getElementById('lowstockAlert');
+    if(!host||!host.parentNode) return;
+    let adBanner=document.getElementById('adBannerDash');
+    if(!adBanner){
+      adBanner=document.createElement('div'); adBanner.id='adBannerDash';
+      adBanner.style.cssText='display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;margin:10px 0;cursor:pointer;background:linear-gradient(135deg,rgba(214,47,53,.15),rgba(214,47,53,.05));border:1px solid rgba(214,47,53,.4);color:var(--red-2)';
+      host.parentNode.insertBefore(adBanner,host);
+    }
+    const days=lastSent?Math.floor((now-lastSent)/86400000):null;
+    const dayText=days!==null?' ('+toFa(days)+' روز از آخرین ارسال)':'';
+    adBanner.innerHTML='<div style="font-size:20px">📢</div><div style="flex:1;font-weight:800;font-size:12px">موعد ارسال تبلیغات رسیده'+dayText+'</div><div>‹</div>';
+    adBanner.onclick=function(){
+      const people=STATE.people.filter(p=>p.phone&&String(p.phone).replace(/\D/g,'').length>=10);
+      if(!people.length){showToast('مشتری با شماره معتبر وجود ندارد','⚠️');return;}
+      openBulkPreview(s.tplAd,people);
+    };
+  }
+  function _bindAdsExtra(){
+    const adInterval=document.getElementById('adInterval'), adLastSent=document.getElementById('adLastSent'), adActive=document.getElementById('adActive');
+    if(adInterval&&STATE.settings) adInterval.value=STATE.settings.adInterval||30;
+    if(adActive&&STATE.settings) adActive.checked=!!STATE.settings.adActive;
+    if(adLastSent&&STATE.settings){
+      try{adLastSent.value=STATE.settings.adLastSent?new Date(STATE.settings.adLastSent).toLocaleDateString('fa-IR'):'هنوز ارسال نشده';}catch(e){}
+    }
+    const btnSaveAds=document.getElementById('btnSaveAds');
+    if(btnSaveAds&&!btnSaveAds._bound){
+      btnSaveAds._bound=true;
+      btnSaveAds.onclick=function(){
+        if(!STATE.settings) STATE.settings={};
+        STATE.settings.adInterval=toNum(adInterval&&adInterval.value)||30;
+        STATE.settings.adActive=!!(adActive&&adActive.checked);
+        saveState(); showToast('تنظیمات تبلیغات ذخیره شد','✓');
+      };
+    }
+    const btnSendAd=document.getElementById('btnSendAdNow');
+    if(btnSendAd&&!btnSendAd._bound){
+      btnSendAd._bound=true;
+      btnSendAd.onclick=function(){
+        const people=STATE.people.filter(p=>p.phone&&String(p.phone).replace(/\D/g,'').length>=10);
+        if(!people.length){showToast('مشتری با شماره معتبر وجود ندارد','⚠️');return;}
+        const text=(STATE.settings&&STATE.settings.tplAd)||'';
+        if(!String(text).trim()){showToast('متن تبلیغات را در تنظیمات وارد کنید','⚠️');return;}
+        openBulkPreview(text,people);
+      };
+    }
+  }
+  let _initDone=false;
+  const _baseInit=init;
+  init=function(){
+    if(_initDone){console.warn('init already called — ignored');return;}
+    _initDone=true; _baseInit(); bindTopBanner();
+    setTimeout(()=>{try{maybeShowDailySummary();}catch(e){} try{renderReminders();}catch(e){}},800);
+  };
+})();
+
 init();
 
 // Service Worker حذف شد — برای اندروید نیتیو لازم نیست
