@@ -1782,6 +1782,7 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
 
     <div class="action-grid">
       <button class="btn btn-primary btn-lg" style="grid-column:1/3" id="btnNewServiceDash">🔧 ثبت سرویس جدید</button>
+      <button class="btn btn-sage btn-lg" style="grid-column:1/3" id="btnQuickSaleDash">🛒 فروش سریع کالا</button>
       <button class="btn btn-ghost" id="btnGoSearchDash">🔍 جستجو</button>
       <button class="btn btn-ghost" id="btnGoSettingsDash">⚙️ تنظیمات</button>
       <button class="btn btn-ghost" id="btnGoReportsDash">📊 گزارش‌ها</button>
@@ -1805,35 +1806,30 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
 
   <!-- ============ SEARCH ============ -->
   <div class="view" id="view-search">
-    <div class="search-box">
+    <div class="search-box" style="margin-bottom:10px">
       <span class="s-ic">🔍</span>
-      <input type="search" id="searchInput" placeholder="جستجو: پلاک، نام یا شماره تماس..." autocomplete="off">
+      <input type="search" id="searchInput" placeholder="جستجوی پلاک، نام یا تلفن..." autocomplete="off">
       <button class="search-clear" id="searchClear" aria-label="پاک کردن" style="display:none">✕</button>
     </div>
 
-    <div class="search-toolbar">
-      <div class="seg" id="searchFilterSeg" style="margin-bottom:8px">
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <div class="seg" id="searchFilterSeg" style="flex:1">
         <button data-sf="all" class="active">همه</button>
         <button data-sf="debt">💰 طلب‌کار</button>
         <button data-sf="reminder">⏰ موعددار</button>
       </div>
-      <div class="search-sort-row">
-        <span class="ssr-lbl">مرتب‌سازی:</span>
-        <button class="btn btn-ghost btn-sm" id="searchSortBtn" style="flex:1; padding:9px 12px; font-size:11.5px; justify-content:space-between;">
-          <span id="searchSortLabel">آخرین سرویس</span>
-          <span>▼</span>
-        </button>
+      <button class="btn btn-ghost btn-sm" id="searchSortBtn" style="padding:8px 10px;flex-shrink:0">مرتب ▼</button>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="search-meta" id="searchMeta" style="margin:0;text-align:right"></div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-sm" id="btnReportSearchResults" title="کپی گزارش" style="padding:6px 10px;font-size:11px">📋</button>
+        <button class="btn btn-ghost btn-sm" id="btnClearHistory" title="پاک تاریخچه" style="padding:6px 10px;font-size:11px;color:var(--red-2)">🗑️</button>
       </div>
     </div>
 
-    <div class="search-meta" id="searchMeta"></div>
-
-    <div class="search-history" id="searchHistory"></div>
-
-    <div class="row2" style="margin-bottom:12px">
-      <button class="btn btn-ghost btn-sm" id="btnReportSearchResults">📋 کپی گزارش</button>
-      <button class="btn btn-ghost btn-sm" id="btnClearHistory">🗑️ پاک تاریخچه</button>
-    </div>
+    <div class="search-history" id="searchHistory" style="margin-bottom:8px"></div>
     <div id="searchResults"></div>
   </div>
 
@@ -1858,11 +1854,22 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
       </div>
     </div>
 
-    <div class="row2" style="margin-bottom:12px">
-      <button class="btn btn-primary btn-sm" id="btnNewPerson">➕ شخص جدید</button>
-      <button class="btn btn-ghost btn-sm" id="btnPhonebook">📞 دفترچه تلفن</button>
+    <div class="seg" id="peopleTabSeg" style="margin-bottom:12px">
+      <button data-ptab="list" class="active">👥 لیست اشخاص</button>
+      <button data-ptab="sales">🛒 فروش‌ها</button>
     </div>
-    <div id="peopleList"></div>
+
+    <div id="peopleListView">
+      <div class="row2" style="margin-bottom:12px">
+        <button class="btn btn-primary btn-sm" id="btnNewPerson">➕ شخص جدید</button>
+        <button class="btn btn-ghost btn-sm" id="btnPhonebook">📞 دفترچه تلفن</button>
+      </div>
+      <div id="peopleList"></div>
+    </div>
+
+    <div id="peopleSalesView" style="display:none">
+      <div id="peopleSalesHost"></div>
+    </div>
   </div>
 
 
@@ -1897,26 +1904,41 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
       <input type="search" id="invSearchInput" placeholder="جستجوی کالا..." autocomplete="off">
     </div>
 
-    <!-- کارت خلاصه -->
     <div class="inv-summary" id="invSummary"></div>
 
-    <!-- بنر کم‌موجود -->
     <div class="inv-low-alert" id="invLowAlert" style="display:none">
       <span class="il-ic">⚠️</span>
       <span class="il-txt" id="invLowTxt"></span>
       <span style="color:var(--warn);font-weight:900;font-size:16px">‹</span>
     </div>
 
-    <!-- toolbar -->
-    <div class="inv-toolbar">
-      <span class="it-lbl">مرتب:</span>
-      <button class="btn btn-ghost btn-sm" id="invSortBtn" style="flex:1;min-width:120px;padding:8px 10px;font-size:11px;justify-content:space-between;"><span id="invSortLabel">نام</span><span>▼</span></button>
-      <button class="it-toggle" id="invLowOnlyToggle">⚠️ فقط کم‌موجود</button>
+    <div class="seg" id="invTabSeg" style="margin-bottom:12px">
+      <button data-invtab="list" class="active">📋 لیست</button>
+      <button data-invtab="report">📊 گزارش</button>
+      <button data-invtab="sales">🛒 فروش</button>
     </div>
 
-    <div class="seg" style="margin-bottom:12px" id="invCatFilter"></div>
-    <button class="btn btn-primary btn-block btn-sm" id="btnAddItem" style="margin-bottom:12px">➕ افزودن کالای جدید</button>
-    <div id="invList"></div>
+    <div id="invListView">
+      <div class="inv-toolbar">
+        <span class="it-lbl">مرتب:</span>
+        <button class="btn btn-ghost btn-sm" id="invSortBtn" style="flex:1;min-width:120px;padding:8px 10px;font-size:11px;justify-content:space-between;"><span id="invSortLabel">نام</span><span>▼</span></button>
+        <button class="it-toggle" id="invLowOnlyToggle">⚠️ فقط کم‌موجود</button>
+      </div>
+
+      <div class="seg" style="margin-bottom:12px" id="invCatFilter"></div>
+      <button class="btn btn-primary btn-block btn-sm" id="btnAddItem" style="margin-bottom:12px">➕ افزودن کالای جدید</button>
+      <button class="btn btn-ghost btn-block btn-sm" id="btnShowGlobalLog" style="margin-bottom:8px">📝 تاریخچه تغییرات انبار</button>
+      <button class="btn btn-ghost btn-block btn-sm" id="btnInvBackup" style="margin-bottom:12px">💾 پشتیبان انبار</button>
+      <div id="invList"></div>
+    </div>
+
+    <div id="invReportView" style="display:none">
+      <div id="invReportHost"></div>
+    </div>
+
+    <div id="invSalesView" style="display:none">
+      <div id="invSalesHost"></div>
+    </div>
   </div>
 
   <!-- ============ SETTINGS ============ -->
@@ -1987,18 +2009,8 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
     <div class="settings-group" data-sg="cats">
       <div class="settings-group-head" id="btnOpenCatsPanel">
         <span class="sg-ic">🗂️</span>
-        <span class="sg-title">دسته‌های اصلی</span>
+        <span class="sg-title">مدیریت دسته‌بندی‌ها</span>
         <span class="sg-arrow">›</span>
-      </div>
-      <div class="settings-group-body">
-        <div class="hint" style="margin-top:6px;margin-bottom:10px">هر دسته در انبار قابل تعریف کالاست و در ثبت سرویس به‌عنوان «کار انجام‌شده» ظاهر می‌شود.</div>
-        <div id="catList"></div>
-        <div class="divider"></div>
-        <div class="row2">
-          <input class="inp" type="text" id="newCatName" placeholder="نام دسته">
-          <select class="inp" id="newCatUnit"><option>عدد</option><option>لیتر</option></select>
-        </div>
-        <button class="btn btn-sage btn-block btn-sm" id="btnAddCat" style="margin-top:10px">➕ افزودن دسته</button>
       </div>
     </div>
 
@@ -2156,7 +2168,6 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
 
   
 <div id="licBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:50;text-align:center;padding:8px;font-size:12px;font-weight:800;background:var(--warn-bg);color:var(--warn)"></div>
-<!-- بخش لایسنس موقتاً کامنت شده است.
 <div id="licenseGate">
   <div class="lic-card">
     <div style="font-size:42px;margin-bottom:6px">🔑</div>
@@ -2166,7 +2177,6 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
     <button class="btn btn-primary btn-block" id="licBtn">فعال‌سازی</button>
   </div>
 </div>
--->
 <div class="sheet-overlay" id="sheetOverlay">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -2190,7 +2200,6 @@ try{if(window.AndroidInsets){window.__setInsets(AndroidInsets.top(),AndroidInset
       <h3>☀️ خلاصه امروز</h3>
       <div class="m-sub" id="dailySub"></div>
       <div id="dailyBody"></div>
-      <button class="btn btn-primary btn-block" id="dailyOk" style="margin-top:14px">باشه، متوجه شدم</button>
     </div>
   </div>
 
@@ -2457,12 +2466,14 @@ function shortMoney(n){
 }
 const DEFAULT_CATS=[{name:'روغن موتور',unit:'لیتر'},{name:'فیلتر روغن',unit:'عدد'},{name:'فیلتر هوا',unit:'عدد'},{name:'فیلتر کابین',unit:'عدد'},{name:'واسکازین',unit:'عدد'},{name:'روغن ترمز',unit:'لیتر'}];
 function defaultQuick(){ return {kms:[3000,5000,7000,10000],works:['شستشوی رادیاتور','شستشوی انژکتور','بالانس چرخ','تعویض لنت']}; }
-function defaultSync(){ return {meta:{services:{},people:{},inventory:{},debts:{}},singles:{},version:0,last:0,dirty:true}; }
+function defaultSync(){ return {meta:{services:{},people:{},inventory:{},debts:{},sales:{}},singles:{},base:{inventory:{}},version:0,last:0,dirty:true}; }
 function defaultState(){
-  return { services:[], people:[], inventory:[], debts:[], cats:DEFAULT_CATS.map(c=>Object.assign({},c)), settings:{ displayName:'', theme:'dark', shopName:'اتو سرویس', shopPhone:'', shopAddress:'', reminderKm:3000, reminderDays:180,
+  return { services:[], people:[], inventory:[], debts:[], sales:[], inventoryLog:[], cats:DEFAULT_CATS.map(c=>Object.assign({},c)), settings:{ displayName:'', theme:'dark', shopName:'اتو سرویس', shopPhone:'', shopAddress:'', reminderKm:3000, reminderDays:180,
       tplReminder: "سلام {name} عزیز 🌹\nیادآوری: موعد سرویس خودرو شما ({plate}) رسیده است.\n⏭️ سرویس بعدی: {km} کیلومتر\n\nمنتظرتون هستیم! 🚗\n{shop}\n📞 {phone}",
       tplInvoice: "با تشکر از اعتماد شما 🙏",
-      defaults:{ parts:{}, works:{} }   // سرویس‌های پیش‌فرض: parts[دسته]={itemId,price} ، works[کار]={price}
+      defaults:{ parts:{}, works:{} },
+      profitPercent: 30,
+      minQtyDefault: 2
     }, quick:defaultQuick(), sync:defaultSync() };
 }
 const LEGACY=[['oilFilter','فیلتر روغن'],['airFilter','فیلتر هوا'],['cabinFilter','فیلتر کابین'],['vaskazin','واسکازین'],['brakeOil','روغن ترمز']];
@@ -2485,8 +2496,10 @@ function loadState(){
       people:Array.isArray(p.people)?p.people:[],
       inventory:Array.isArray(p.inventory)?p.inventory:[],
       debts:Array.isArray(p.debts)?p.debts:[],
+      sales:Array.isArray(p.sales)?p.sales:[],
+      inventoryLog:Array.isArray(p.inventoryLog)?p.inventoryLog:[],
       cats:(Array.isArray(p.cats)&&p.cats.length)?p.cats:DEFAULT_CATS.map(c=>Object.assign({},c)),
-      settings:Object.assign(d.settings,p.settings||{},{ defaults:{ parts:Object.assign({},(p.settings&&p.settings.defaults&&p.settings.defaults.parts)||{}), works:Object.assign({},(p.settings&&p.settings.defaults&&p.settings.defaults.works)||{}) } }),
+      settings:Object.assign(d.settings,p.settings||{},{ defaults:{ parts:Object.assign({},(p.settings&&p.settings.defaults&&p.settings.defaults.parts)||{}), works:Object.assign({},(p.settings&&p.settings.defaults&&p.settings.defaults.works)||{}) }, profitPercent:(p.settings&&p.settings.profitPercent)||30, minQtyDefault:(p.settings&&p.settings.minQtyDefault)||2 }),
       quick:Object.assign(defaultQuick(),p.quick||{}),
       sync:Object.assign(defaultSync(),p.sync||{})
     });
@@ -2519,20 +2532,70 @@ function saveRecord(record){
   if(idx>-1) STATE.services[idx]=record; else STATE.services.push(record);
   saveState();
 }
-function applyStock(works,sign){
-  (works||[]).forEach(w=>{
+function applyStock(works, sign){
+  let totalCost = 0;
+  const warnings = [];
+  (works||[]).forEach(w => {
     if(!w.itemId) return;
-    const it=STATE.inventory.find(i=>i.id===w.itemId);
-    if(!it) return;
-    let newQty = Math.round((Number(it.qty||0) + sign*Number(w.qty||0))*1000)/1000;
-    if(newQty < 0) newQty = 0;
-    it.qty = newQty;
+    const item = STATE.inventory.find(i => i.id === w.itemId);
+    if(!item) return;
+    const qty = Number(w.qty || 0);
+    if(qty <= 0) return;
+    if(sign === -1){
+      const result = consumeFIFO(item, qty);
+      w.actualCost = result.actualCost;
+      w.batchesUsed = result.batchesUsed;
+      w.fifoUnitCost = qty > 0 ? Math.round(result.actualCost / qty) : 0;
+      totalCost += result.actualCost;
+      if(result.shortfall > 0){
+        warnings.push({
+          itemName: item.name,
+          shortfall: result.shortfall,
+          message: `موجودی «${item.name}» کافی نبود (${result.shortfall} ${item.unit} کمتر)`
+        });
+      }
+    } else {
+      if(w.batchesUsed && w.batchesUsed.length > 0){
+        w.batchesUsed.forEach(bu => {
+          const batch = (item.batches || []).find(b => b.id === bu.batchId);
+          if(batch){
+            batch.qty = Number(batch.qty) + Number(bu.qty);
+          } else {
+            if(!item.batches) item.batches = [];
+            item.batches.push({
+              id: bu.batchId, qty: bu.qty, cost: bu.cost,
+              date: todayJalali(), supplierId: null, invoiceNo: null,
+              createdAt: Date.now(), restored: true
+            });
+          }
+        });
+      } else if(w.actualCost && qty > 0){
+        const unitCost = Math.round(w.actualCost / qty);
+        if(!item.batches) item.batches = [];
+        item.batches.push({
+          id: 'b_' + Date.now() + Math.random().toString(36).slice(2, 6),
+          qty: qty, cost: unitCost, date: todayJalali(),
+          createdAt: Date.now(), restored: true
+        });
+      } else {
+        const avg = itemAvgCost(item);
+        if(!item.batches) item.batches = [];
+        item.batches.push({
+          id: 'b_' + Date.now() + Math.random().toString(36).slice(2, 6),
+          qty: qty, cost: avg || Number(w.ip || 0),
+          date: todayJalali(), createdAt: Date.now(), restored: true
+        });
+      }
+    }
   });
+  return { totalCost, warnings };
 }
 function deleteRecord(id){
-  const r=STATE.services.find(s=>s.id===id);
-  if(r) applyStock(r.works,+1);
-  STATE.services=STATE.services.filter(s=>s.id!==id);
+  const r = STATE.services.find(s => s.id === id);
+  if(r){
+    applyStock(r.works, +1);
+  }
+  STATE.services = STATE.services.filter(s => s.id !== id);
   saveState();
 }
 function personOf(r){ return STATE.people.find(p=>p.id===r.personId)||{id:'',name:'—',phone:''}; }
@@ -2666,7 +2729,7 @@ function newWizard(){
     plateType:'std',
     plate:{p1:'',letter:'الف',p2:'',p3:''},
     plateFree:'', name:'', phone:'', personId:'', recId:null, pay:null,
-    data:{ date:todayJalali(), oilType:'', kmCurrent:'', kmNext:'', works:{}, extraSel:{}, extraCustom:[], extraPrice:{}, note:'' }
+    data:{ date:todayJalali(), oilType:'', kmCurrent:'', kmNext:'', works:{}, extraSel:{}, extraCustom:[], extraPrice:{}, note:'', saleItems:[], saleDiscount:0 }
   };
 }
 function startWizard(){ wizard=newWizard(); renderWizard(); }
@@ -2774,6 +2837,11 @@ function calcLiveTotal(){
       }
     });
   }
+  // فروش کالا
+  const saleTotal = (d.saleItems || []).reduce((sum, i) => sum + (Number(i.price) * Number(i.qty)), 0);
+  const saleDiscount = Number(d.saleDiscount) || 0;
+  total += Math.max(0, saleTotal - saleDiscount);
+
   return total;
 }
 function renderLiveTotal(){
@@ -2884,6 +2952,789 @@ function ensurePerson(){
 
 /* ---- مرحله ۲: فرم سرویس (قطعات و کارهای انجام‌شده) ---- */
 function qf(n){ return toFa((Math.round((parseFloat(n)||0)*100)/100).toLocaleString('en-US')); }
+
+/* ══════════════════════════════════════════════════════════════
+   FIFO ENGINE — موتور محاسبه انبار بر اساس FIFO
+   ══════════════════════════════════════════════════════════════ */
+function itemQty(item){
+  if(!item) return 0;
+  if(!item.batches) return Number(item.qty||0);
+  return item.batches.reduce((sum, b) => sum + Number(b.qty||0), 0);
+}
+function itemAvgCost(item){
+  if(!item) return 0;
+  if(!item.batches){ return Number(item.cost||0); }
+  const totalQty = itemQty(item);
+  if(totalQty === 0) return 0;
+  const totalCost = item.batches.reduce((sum, b) => sum + (Number(b.qty||0) * Number(b.cost||0)), 0);
+  return Math.round(totalCost / totalQty);
+}
+function itemStockValue(item){
+  if(!item) return 0;
+  if(!item.batches) return Number(item.qty||0) * Number(item.cost||0);
+  return item.batches.reduce((sum, b) => sum + (Number(b.qty||0) * Number(b.cost||0)), 0);
+}
+function itemBatchCount(item){
+  if(!item || !item.batches) return 0;
+  return item.batches.filter(b => b.qty > 0).length;
+}
+function consumeFIFO(item, qtyToConsume){
+  if(!item) return { actualCost: 0, batchesUsed: [], shortfall: qtyToConsume };
+  if(!item.batches || !item.batches.length){
+    if(item.qty){
+      const take = Math.min(item.qty, qtyToConsume);
+      const cost = take * Number(item.cost||0);
+      item.qty -= take;
+      return { actualCost: cost, batchesUsed: [{ qty: take, cost: item.cost||0 }], shortfall: qtyToConsume - take };
+    }
+    return { actualCost: 0, batchesUsed: [], shortfall: qtyToConsume };
+  }
+  item.batches.sort((a, b) => {
+    const da = a.date ? jalaliDayNum(a.date) : 0;
+    const db = b.date ? jalaliDayNum(b.date) : 0;
+    return da - db;
+  });
+  let remaining = Number(qtyToConsume);
+  let actualCost = 0;
+  const batchesUsed = [];
+  for(let i = 0; i < item.batches.length && remaining > 0; i++){
+    const b = item.batches[i];
+    if(Number(b.qty) <= 0) continue;
+    const take = Math.min(Number(b.qty), remaining);
+    b.qty = Number(b.qty) - take;
+    actualCost += take * Number(b.cost||0);
+    remaining -= take;
+    batchesUsed.push({ batchId: b.id, qty: take, cost: Number(b.cost||0) });
+  }
+  item.batches = item.batches.filter(b => Number(b.qty) > 0);
+  if(actualCost > 0){
+    logInventoryChange('consume', item.id, item.name, {
+      qty: qtyToConsume - remaining,
+      totalCost: actualCost,
+      remainingShortfall: remaining
+    });
+  }
+  return { actualCost, batchesUsed, shortfall: remaining };
+}
+function addBatch(item, qty, cost, date, supplierId, invoiceNo){
+  if(!item) return null;
+  if(!item.batches) item.batches = [];
+  const batch = {
+    id: 'b_' + Date.now() + Math.random().toString(36).slice(2, 6),
+    qty: Number(qty) || 0,
+    cost: Number(cost) || 0,
+    date: date || todayJalali(),
+    supplierId: supplierId || null,
+    invoiceNo: invoiceNo || null,
+    createdAt: Date.now()
+  };
+  item.batches.push(batch);
+  logInventoryChange('purchase', item.id, item.name, {
+    qty: batch.qty, cost: batch.cost, total: batch.qty * batch.cost,
+    supplier: supplierId, invoiceNo: invoiceNo
+  });
+  return batch;
+}
+function migrateInventoryToFIFO(){
+  if(!STATE || !STATE.inventory) return;
+  let migrated = 0;
+  const today = todayJalali();
+  STATE.inventory.forEach(item => {
+    if(!item.batches || !Array.isArray(item.batches)){
+      const qty = Number(item.qty || 0);
+      const cost = Number(item.cost || 0);
+      item.batches = [];
+      if(qty > 0){
+        item.batches.push({
+          id: 'b_' + Date.now() + Math.random().toString(36).slice(2, 6),
+          qty: qty, cost: cost, date: today, supplierId: null, invoiceNo: null,
+          createdAt: Date.now(), migrationNote: 'دسته اولیه (مهاجرت از داده‌های قدیمی)'
+        });
+      }
+      delete item.qty;
+      delete item.cost;
+      if(item.minQty === undefined) item.minQty = 2;
+      migrated++;
+    } else if(item.minQty === undefined){
+      item.minQty = 2;
+    }
+  });
+  if(migrated > 0){
+    console.log('✅ مهاجرت ' + migrated + ' کالا به ساختار FIFO انجام شد');
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+  }
+}
+function logInventoryChange(action, itemId, itemName, details){
+  if(!STATE.inventoryLog) STATE.inventoryLog = [];
+  const entry = {
+    id: 'log_' + Date.now() + Math.random().toString(36).slice(2, 6),
+    action: action, itemId: itemId, itemName: itemName,
+    details: details || {},
+    user: (STATE.settings && STATE.settings.displayName) || 'کاربر',
+    at: Date.now(), date: todayJalali()
+  };
+  STATE.inventoryLog.unshift(entry);
+  if(STATE.inventoryLog.length > 500) STATE.inventoryLog = STATE.inventoryLog.slice(0, 500);
+  return entry;
+}
+function createSale(data){
+  if(!data || !data.items || !data.items.length) return null;
+  if(!STATE.sales) STATE.sales = [];
+  const saleId = 'sale_' + Date.now() + Math.random().toString(36).slice(2, 6);
+  const now = Date.now();
+  let totalPrice = 0, totalCost = 0;
+  const items = [];
+  data.items.forEach(item => {
+    const inv = STATE.inventory.find(x => x.id === item.itemId);
+    if(!inv) return;
+    const qty = Number(item.qty) || 0;
+    if(qty <= 0) return;
+    const fifoResult = consumeFIFO(inv, qty);
+    const unitPrice = Number(item.price) || 0;
+    const itemTotal = unitPrice * qty;
+    const actualCost = fifoResult.actualCost;
+    items.push({
+      itemId: inv.id, itemName: inv.name, unit: inv.unit, qty: qty,
+      price: unitPrice, total: itemTotal, actualCost: actualCost,
+      fifoUnitCost: qty > 0 ? Math.round(actualCost / qty) : 0,
+      batchesUsed: fifoResult.batchesUsed || []
+    });
+    totalPrice += itemTotal;
+    totalCost += actualCost;
+  });
+  if(!items.length) return null;
+  const discount = Number(data.discount) || 0;
+  const finalPrice = Math.max(0, totalPrice - discount);
+  const sale = {
+    id: saleId, personId: data.personId || null, personName: data.personName || 'ناشناس',
+    date: data.date || todayJalali(), items: items, subtotal: totalPrice, discount: discount,
+    totalPrice: finalPrice, totalCost: totalCost, profit: finalPrice - totalCost,
+    payment: data.payment || { method: 'cash', amount: finalPrice, settled: true },
+    note: data.note || '', createdAt: now, updatedAt: now
+  };
+  STATE.sales.push(sale);
+  logInventoryChange('sale', items[0].itemId, 'فروش کالا', {
+    saleId: saleId, itemsCount: items.length, totalPrice: finalPrice, profit: sale.profit, buyer: sale.personName
+  });
+  saveState();
+  return sale;
+}
+
+function openPersonPickerSheet(onSelect){
+  const people = STATE.people.slice().sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+  $('sheetTitle').textContent = 'انتخاب مشتری';
+  const body = $('sheetBody');
+  body.innerHTML = `
+    <div class="search-box" style="margin-bottom:12px">
+      <span class="s-ic">🔍</span>
+      <input type="search" id="personPickerSearch" placeholder="جستجوی نام یا تلفن..." autocomplete="off" style="direction:rtl">
+    </div>
+    <div id="personPickerList" style="max-height:60vh;overflow-y:auto"></div>
+  `;
+  const renderList = (query) => {
+    const q = normalizeFa(query || '');
+    const filtered = !q ? people : people.filter(p =>
+      normalizeFa(p.name || '').includes(q) || (p.phone || '').includes(toEn(query || ''))
+    );
+    const listEl = $('personPickerList');
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="empty-state"><div class="s">موردی یافت نشد</div></div>';
+      return;
+    }
+    listEl.innerHTML = filtered.slice(0, 30).map(p => `
+      <div class="list-item" data-pick-person-id="${p.id}" style="cursor:pointer">
+        <div class="li-icon" style="background:var(--sage-bg);color:var(--sage)">👤</div>
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(p.name)}</div>
+          <div class="li-sub"><span class="mono">${toFa(p.phone || '')}</span></div>
+        </div>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('[data-pick-person-id]').forEach(el => {
+      el.onclick = () => {
+        const p = STATE.people.find(x => x.id === el.dataset.pickPersonId);
+        if (p) { onSelect(p); closeSheet(); }
+      };
+    });
+  };
+  renderList('');
+  $('personPickerSearch').oninput = (e) => renderList(e.target.value);
+  $('sheetOverlay').classList.add('show');
+}
+
+function openQuickSalePickerSheet(preselectedItemId, preselectedPerson){
+  const items = STATE.inventory.filter(i => itemQty(i) > 0);
+  if(!items.length){ showToast('کالایی در انبار موجود نیست', '⚠️'); return; }
+  $('sheetTitle').textContent = 'فروش سریع — انتخاب کالا';
+  const body = $('sheetBody');
+  const selected = {};
+  if(preselectedItemId){
+    const inv = items.find(x => x.id === preselectedItemId);
+    if(inv) selected[inv.id] = { itemId: inv.id, name: inv.name, qty: 1, price: inv.price || 0, unit: inv.unit, maxQty: itemQty(inv) };
+  }
+  body.innerHTML = `
+    <div class="search-box" style="margin-bottom:12px"><span class="s-ic">🔍</span><input type="search" id="qsPickerSearch" placeholder="جستجوی کالا..." autocomplete="off" style="direction:rtl"></div>
+    <div id="qsPickerFilter" class="seg" style="margin-bottom:12px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px"><button data-qcat="" class="active" style="flex:0 0 auto;min-width:auto;padding:8px 14px">همه</button>${STATE.cats.map(c => `<button data-qcat="${escapeHtml(c.name)}" style="flex:0 0 auto;min-width:auto;padding:8px 14px">${escapeHtml(c.name)}</button>`).join('')}</div>
+    <div id="qsPickerList" style="max-height:45vh;overflow-y:auto"></div>
+    <div id="qsPickerFooter" style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:${Object.keys(selected).length > 0 ? 'block' : 'none'}"><div style="background:var(--sage-bg);border:1px solid rgba(90,232,150,.3);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:800;color:var(--sage)" id="qsSelectedCount">${toFa(Object.keys(selected).length)} کالا</span><button class="btn btn-sage btn-sm" id="qsConfirmBtn" style="padding:8px 14px">✓ ادامه</button></div></div>`;
+  let currentCat = '', currentSearch = '';
+  const renderPickerList = () => {
+    const q = normalizeFa(currentSearch);
+    const filtered = items.filter(i => { if(currentCat && i.cat !== currentCat) return false; if(q && !normalizeFa(i.name).includes(q) && !normalizeFa(i.cat).includes(q)) return false; return true; });
+    const listEl = $('qsPickerList');
+    if(!filtered.length){ listEl.innerHTML = '<div class="empty-state"><div class="s">کالایی یافت نشد</div></div>'; return; }
+    listEl.innerHTML = filtered.map(i => {
+      const qty = itemQty(i), isSel = !!selected[i.id];
+      const stepper = isSel ? `<div class="qs-step" data-qs-step="${i.id}" style="display:flex;align-items:center;gap:8px;margin:-2px 0 8px;padding:8px 10px;background:var(--panel-3);border:1px solid var(--sage);border-radius:12px"><span style="font-size:11px;font-weight:800;flex:1;color:var(--muted)">تعداد فروش (${i.unit})</span><button type="button" class="inv-qty-btn sub" data-qs-dec="${i.id}" style="width:34px;height:34px;font-size:18px">−</button><input type="text" inputmode="decimal" data-qs-qty-in="${i.id}" value="${qf(selected[i.id].qty)}" style="width:64px;padding:8px 4px;text-align:center;font-size:14px;font-weight:900;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--paper)"><button type="button" class="inv-qty-btn add" data-qs-inc="${i.id}" style="width:34px;height:34px;font-size:18px">+</button></div>` : '';
+      return `<div class="qs-row">` + `<div class="list-item" data-qpick-item="${i.id}" style="cursor:pointer;${isSel ? 'border-color:var(--sage);background:var(--sage-bg)' : ''}"><div class="li-icon" style="background:${isSel ? 'var(--sage-bg)' : 'var(--panel-3)'};color:${isSel ? 'var(--sage)' : 'var(--paper)'}">${isSel ? '✓' : (i.unit === 'لیتر' ? '🛢️' : '📦')}</div><div class="li-main"><div class="li-title">${escapeHtml(i.name)}</div><div class="li-sub">${escapeHtml(i.cat)} · موجودی: ${qf(qty)} ${i.unit}</div></div><div class="li-badge" style="color:var(--sage)">${i.price ? shortMoney(i.price) : '—'}</div></div>` + stepper + `</div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-qpick-item]').forEach(el => {
+      el.onclick = () => {
+        const id = el.dataset.qpickItem;
+        if(selected[id]) delete selected[id];
+        else { const inv = items.find(x => x.id === id); selected[id] = { itemId: id, name: inv.name, qty: 1, price: inv.price || 0, unit: inv.unit, maxQty: itemQty(inv) }; }
+        updateQSFooter(); renderPickerList();
+      };
+    });
+    const clampQ = (id, v) => { const it = selected[id]; if(!it) return 0; v = Math.round((Number(v) || 0) * 100) / 100; if(v > it.maxQty){ v = it.maxQty; showToast('بیشتر از موجودی انبار نیست (' + qf(it.maxQty) + ' ' + it.unit + ')', '⚠️'); } if(v < 0) v = 0; return v; };
+    listEl.querySelectorAll('[data-qs-dec]').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); const id = btn.dataset.qsDec; const it = selected[id]; if(!it) return; it.qty = Math.max(1, clampQ(id, it.qty - 1)); const inp = listEl.querySelector('[data-qs-qty-in="' + id + '"]'); if(inp) inp.value = qf(it.qty); updateQSFooter(); }; });
+    listEl.querySelectorAll('[data-qs-inc]').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); const id = btn.dataset.qsInc; const it = selected[id]; if(!it) return; it.qty = clampQ(id, it.qty + 1); const inp = listEl.querySelector('[data-qs-qty-in="' + id + '"]'); if(inp) inp.value = qf(it.qty); updateQSFooter(); }; });
+    listEl.querySelectorAll('[data-qs-qty-in]').forEach(inp => {
+      inp.onclick = (e) => e.stopPropagation();
+      inp.oninput = () => { const id = inp.dataset.qsQtyIn; const it = selected[id]; if(!it) return; const raw = toDec(inp.value); const v = clampQ(id, raw); if(v !== raw) inp.value = qf(v); it.qty = v; updateQSFooter(); };
+      inp.onblur = () => { const id = inp.dataset.qsQtyIn; const it = selected[id]; if(!it) return; if(!(it.qty > 0)) it.qty = 1; inp.value = qf(it.qty); updateQSFooter(); };
+    });
+  };
+  const updateQSFooter = () => {
+    const count = Object.keys(selected).length;
+    const footer = $('qsPickerFooter');
+    if(footer) footer.style.display = count > 0 ? 'block' : 'none';
+    const cntEl = $('qsSelectedCount');
+    const tot = Object.values(selected).reduce((a, x) => a + (x.qty || 0) * (x.price || 0), 0);
+    if(cntEl) cntEl.textContent = `${toFa(count)} کالا` + (tot ? ` · ${shortMoney(tot)} تومان` : '');
+  };
+  $('qsPickerSearch').oninput = (e) => { currentSearch = e.target.value; renderPickerList(); };
+  document.querySelectorAll('#qsPickerFilter [data-qcat]').forEach(b => {
+    b.onclick = () => { currentCat = b.dataset.qcat; document.querySelectorAll('#qsPickerFilter [data-qcat]').forEach(x => x.classList.toggle('active', x === b)); renderPickerList(); };
+  });
+  renderPickerList();
+  setTimeout(() => {
+    const btn = $('qsConfirmBtn');
+    if(btn) btn.onclick = () => {
+      const selectedItems = Object.values(selected).filter(x => x.qty > 0);
+      if(!selectedItems.length){ showToast('تعداد را وارد کنید', '⚠️'); return; }
+      closeSheet(); setTimeout(() => openQuickSaleInvoiceSheet(selectedItems, preselectedPerson), 100);
+    };
+  }, 50);
+  $('sheetOverlay').classList.add('show');
+}
+
+function openQuickSaleInvoiceSheet(items, preselectedPerson){
+  if(!items || !items.length) return;
+  $('sheetTitle').textContent = 'نهایی‌سازی فروش';
+  const body = $('sheetBody');
+  const workingItems = items.map(i => Object.assign({}, i));
+  
+  // 👈 این خط باید حتما قبل از ساخت HTML باشه
+  let selectedPerson = preselectedPerson || null; 
+  let payMethod = 'cash';
+
+  body.innerHTML = `
+    <div class="field">
+      <label>👤 خریدار (اختیاری)</label>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="qsSaleBuyer" placeholder="ناشناس" style="flex:1" value="${selectedPerson ? selectedPerson.name : ''}">
+        <button type="button" class="btn btn-ghost btn-sm" id="qsPickCustomer" style="padding:10px 14px">📋</button>
+      </div>
+    </div>
+    <div id="qsBuyerSuggestions" style="margin-bottom:10px;display:none"></div>
+    ${jcalHTML('qsSaleDate', todayJalali(), 'تاریخ فروش')}
+    
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:900;margin-bottom:8px">📦 اقلام فروش</div>
+      <div id="qsInvoiceItems"></div>
+    </div>
+    
+    <div class="field"><label>🏷️ تخفیف (تومان)</label><input type="text" inputmode="numeric" id="qsSaleDiscount" placeholder="۰"></div>
+    <div class="field"><label>💳 نوع پرداخت</label><div class="seg" id="qsSalePaySeg"><button data-qs-pm="cash" class="active">نقدی</button><button data-qs-pm="credit">نسیه</button></div></div>
+    <div id="qsPreviewBox" style="margin:14px 0"></div>
+    <div class="row2"><button class="btn btn-sage" id="qsSubmitSale">💾 ثبت فروش</button><button class="btn btn-ghost" id="qsCancelSale">انصراف</button></div>`;
+  
+  bindJcal('qsSaleDate'); commaInput($('qsSaleDiscount'));
+  
+  const buyerInput = $('qsSaleBuyer'), suggBox = $('qsBuyerSuggestions');
+  
+  buyerInput.oninput = () => {
+    const q = normalizeFa(buyerInput.value.trim());
+    if(!q || q.length < 2){ suggBox.style.display = 'none'; selectedPerson = null; return; }
+    const matches = STATE.people.filter(p => normalizeFa(p.name || '').includes(q) || (p.phone || '').includes(toEn(buyerInput.value))).slice(0, 5);
+    if(!matches.length){ suggBox.style.display = 'none'; return; }
+    suggBox.innerHTML = matches.map(p => `<div data-qpick-person="${p.id}" style="cursor:pointer;padding:8px 12px;background:var(--panel-3);border-radius:8px;margin-bottom:4px;font-size:11px"><b>${escapeHtml(p.name)}</b> <span style="color:var(--muted);font-size:10px">${toFa(p.phone)}</span></div>`).join('');
+    suggBox.style.display = 'block';
+    suggBox.querySelectorAll('[data-qpick-person]').forEach(el => {
+      el.onclick = () => { const p = STATE.people.find(x => x.id === el.dataset.qpickPerson); if(p){ selectedPerson = p; buyerInput.value = p.name; suggBox.style.display = 'none'; } };
+    });
+  };
+
+  if($('qsPickCustomer')){
+    $('qsPickCustomer').onclick = () => {
+      openPersonPickerSheet((p) => {
+        selectedPerson = p;
+        if($('qsSaleBuyer')) $('qsSaleBuyer').value = p.name;
+      });
+    };
+  }
+
+  document.querySelectorAll('#qsSalePaySeg [data-qs-pm]').forEach(b => {
+    b.onclick = () => { payMethod = b.dataset.qsPm; document.querySelectorAll('#qsSalePaySeg [data-qs-pm]').forEach(x => x.classList.toggle('active', x === b)); updatePreview(); };
+  });
+  
+  const renderItems = () => {
+    const el = $('qsInvoiceItems'); if(!el) return;
+    el.innerHTML = workingItems.map((item, idx) => `
+      <div style="background:var(--panel-3);border-radius:12px;padding:10px;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:800;flex:1">${escapeHtml(item.name)}</div>
+          <button class="inv-qty-btn" data-qs-rm="${idx}" style="width:22px;height:22px;font-size:10px;background:var(--red-bg);color:var(--red-2)">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:9px;color:var(--muted)">تعداد (${item.unit})</div>
+            <input type="text" inputmode="decimal" data-qs-qty="${idx}" value="${qf(item.qty)}" style="width:100%;padding:8px;text-align:center;font-size:12px;font-weight:900;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--paper)">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted)">قیمت واحد</div>
+            <input type="text" inputmode="numeric" data-qs-price="${idx}" value="${item.price ? thousands(item.price) : ''}" style="width:100%;padding:8px;text-align:center;font-size:12px;font-weight:900;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--paper)">
+          </div>
+        </div>
+      </div>
+    `).join('');
+    
+    el.querySelectorAll('[data-qs-rm]').forEach(btn => { btn.onclick = () => { workingItems.splice(parseInt(btn.dataset.qsRm), 1); if(!workingItems.length){ closeSheet(); return; } renderItems(); updatePreview(); }; });
+    el.querySelectorAll('[data-qs-qty]').forEach(inp => { inp.oninput = () => { const idx = parseInt(inp.dataset.qsQty); let q = toDec(inp.value); if(q > workingItems[idx].maxQty){ q = workingItems[idx].maxQty; inp.value = qf(q); } workingItems[idx].qty = q; updatePreview(); }; });
+    el.querySelectorAll('[data-qs-price]').forEach(inp => { inp.oninput = () => { const idx = parseInt(inp.dataset.qsPrice); const p = toNum(inp.value); inp.value = p ? thousands(p) : ''; workingItems[idx].price = p; updatePreview(); }; });
+  };
+  
+  const updatePreview = () => {
+    const subtotal = workingItems.reduce((a, i) => a + (i.qty * i.price), 0);
+    const discount = toNum($('qsSaleDiscount').value);
+    const finalPrice = Math.max(0, subtotal - discount);
+    let totalCost = 0;
+    workingItems.forEach(i => { const inv = STATE.inventory.find(x => x.id === i.itemId); if(inv){ const temp = JSON.parse(JSON.stringify(inv)); totalCost += consumeFIFO(temp, i.qty).actualCost; } });
+    const profit = finalPrice - totalCost;
+    const box = $('qsPreviewBox');
+    if(box) box.innerHTML = `<div style="background:var(--panel-3);border-radius:12px;padding:12px"><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="color:var(--muted)">جمع:</span><b>${money(subtotal)}</b></div>${discount > 0 ? `<div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="color:var(--warn)">تخفیف:</span><b style="color:var(--warn)">− ${money(discount)}</b></div>` : ''}<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;padding-top:8px;border-top:1px dashed var(--line);margin-top:6px"><span>مبلغ نهایی:</span><span style="color:var(--sage)">${money(finalPrice)}</span></div><div style="display:flex;justify-content:space-between;font-size:10px;margin-top:6px"><span style="color:var(--muted)">📈 سود:</span><b style="color:${profit >= 0 ? 'var(--sage)' : 'var(--red-2)'}">${money(profit)}</b></div></div>`;
+  };
+  
+  $('qsSaleDiscount').addEventListener('input', updatePreview);
+  renderItems(); updatePreview();
+  
+  $('qsSubmitSale').onclick = () => {
+    const validItems = workingItems.filter(i => i.qty > 0 && i.price > 0);
+    if(!validItems.length){ showToast('هیچ کالای معتبری نیست', '⚠️'); return; }
+    const discount = toNum($('qsSaleDiscount').value);
+    const subtotal = validItems.reduce((a, i) => a + (i.qty * i.price), 0);
+    const finalPrice = Math.max(0, subtotal - discount);
+    const sale = createSale({
+      items: validItems.map(i => ({ itemId: i.itemId, qty: i.qty, price: i.price })),
+      personId: selectedPerson ? selectedPerson.id : null,
+      personName: selectedPerson ? selectedPerson.name : (buyerInput.value.trim() || 'ناشناس'),
+      date: jcalGet('qsSaleDate'), discount: discount,
+      payment: { method: payMethod, amount: finalPrice, settled: payMethod === 'cash' }
+    });
+    if(!sale){ showToast('خطا در ثبت', '⚠️'); return; }
+    showToast('✅ فروش ثبت شد · سود: ' + money(sale.profit), '✓');
+    closeSheet();
+    if($('invSalesView') && $('invSalesView').style.display !== 'none') renderInventorySales();
+    setTimeout(() => openSaleInvoiceSheet(sale.id), 300);
+  };
+  
+  $('qsCancelSale').onclick = closeSheet;
+  $('sheetOverlay').classList.add('show');
+}
+
+function openSaleInvoiceSheet(saleId){
+  const sale = (STATE.sales || []).find(s => s.id === saleId);
+  if(!sale){ showToast('فاکتور پیدا نشد', '⚠️'); return; }
+  $('sheetTitle').textContent = 'فاکتور فروش';
+  const body = $('sheetBody');
+  const settings = STATE.settings || {};
+  const itemsHtml = sale.items.map((item, i) => `<div class="inv-row"><span class="inv-label">${toFa(i + 1)}. ${escapeHtml(item.itemName)}${item.qty > 1 ? ` <span class="inv-badge">×${toFa(item.qty)}</span>` : ''}</span><span class="inv-val">${money(item.total)}</span></div>`).join('');
+  body.innerHTML = `<div class="invoice-wrap"><div class="inv-head"><div><h2>${escapeHtml(settings.shopName || 'اتو سرویس')}</h2><div class="inv-sub">${escapeHtml(settings.shopPhone || '')}</div></div><div style="text-align:left"><div style="font-size:10px;color:#888;font-weight:800">فاکتور فروش</div><div style="font-weight:900;font-size:13px;margin-top:2px">${fmtJalali(sale.date)}</div></div></div>
+    <div class="inv-section-title">👤 خریدار</div>
+    <div class="inv-info-grid"><div class="iig-item"><span class="iig-lbl">نام</span><span class="iig-val">${escapeHtml(sale.personName || 'ناشناس')}</span></div></div>
+    <div class="inv-section-title">🛒 اقلام فروش</div>${itemsHtml}
+    ${sale.discount > 0 ? `<div class="inv-row" style="color:#B87400"><span class="inv-label">🏷️ تخفیف</span><span class="inv-val">− ${money(sale.discount)}</span></div>` : ''}
+    <div class="inv-row total-row"><span class="inv-label">💰 مبلغ کل</span><span class="inv-val">${money(sale.totalPrice)}</span></div>
+    <div class="inv-footer">${escapeHtml(settings.shopName || 'اتو سرویس')} · ${fmtJalali(todayJalali())}<br>با تشکر از خرید شما 🙏</div></div>
+    <div class="invoice-print-actions no-print" style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn btn-primary" id="btnPrintSale">🖨️ چاپ</button><button class="btn btn-sage" id="btnDownloadSalePdf">💾 PDF</button></div>
+    <button class="btn btn-ghost btn-block no-print" id="btnCloseSaleInv" style="margin-top:8px">بستن</button>`;
+  $('btnPrintSale').onclick = () => { if(typeof safePrint==='function') safePrint(); else window.print(); };
+  $('btnDownloadSalePdf').onclick = () => { if(typeof safeSavePdf==='function') safeSavePdf('Sale-' + sale.id.slice(-8)); };
+  $('btnCloseSaleInv').onclick = closeSheet;
+  $('sheetOverlay').classList.add('show');
+}
+
+function renderInventorySales(){
+  const host = $('invSalesHost'); if(!host) return;
+  const sales = [...(STATE.sales || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  if(!sales.length){
+    host.innerHTML = `<div class="empty-state"><div class="ic">🛒</div><div class="t">هنوز فروشی ثبت نشده</div><div class="s">از تب لیست روی کالا «فروش» بزنید</div></div>
+      <button class="btn btn-sage btn-block" id="btnQuickSaleFromEmpty" style="margin-top:12px">🛒 فروش سریع کالا</button>`;
+    const btnEmpty = $('btnQuickSaleFromEmpty');
+    if(btnEmpty) btnEmpty.onclick = () => openQuickSalePickerSheet();
+    return;
+  }
+  const totalRevenue = sales.reduce((a, s) => a + (s.totalPrice || 0), 0);
+  const totalProfit = sales.reduce((a, s) => a + (s.profit || 0), 0);
+  const today = todayJalali();
+  const todaySales = sales.filter(s => sameJalaliDay(s.date, today));
+  const todayRevenue = todaySales.reduce((a, s) => a + (s.totalPrice || 0), 0);
+  host.innerHTML = `<button class="btn btn-sage btn-block btn-lg" id="btnQuickSaleMain" style="margin-bottom:12px">🛒 فروش سریع کالا</button>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--panel-3);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9.5px;color:var(--muted);font-weight:700">امروز</div><div style="font-size:12px;font-weight:900;color:var(--sage);margin-top:2px">${todayRevenue ? shortMoney(todayRevenue) : '—'}</div><div style="font-size:9px;color:var(--muted);margin-top:2px">${toFa(todaySales.length)} فروش</div></div>
+        <div style="background:var(--panel-3);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9.5px;color:var(--muted);font-weight:700">کل فروش</div><div style="font-size:12px;font-weight:900;color:var(--sage);margin-top:2px">${shortMoney(totalRevenue)}</div><div style="font-size:9px;color:var(--muted);margin-top:2px">${toFa(sales.length)} فروش</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding-top:8px;border-top:1px dashed var(--line)"><span style="color:var(--muted)">📈 مجموع سود:</span><b style="color:var(--sage)">${shortMoney(totalProfit)}</b></div>
+    </div>
+    <div class="search-box" style="margin-bottom:10px"><span class="s-ic">🔍</span><input type="search" id="salesSearchInput" placeholder="جستجوی نام خریدار یا کالا..." autocomplete="off" style="direction:rtl"></div>
+    <div id="salesListBody"></div>`;
+  const renderList = (query) => {
+    const q = normalizeFa(query || '');
+    const filtered = !q ? sales : sales.filter(s => normalizeFa(s.personName || '').includes(q) || (s.items || []).some(it => normalizeFa(it.itemName || '').includes(q)));
+    const listEl = $('salesListBody');
+    if(!filtered.length){ listEl.innerHTML = '<div class="empty-state"><div class="s">موردی یافت نشد</div></div>'; return; }
+    listEl.innerHTML = filtered.slice(0, 50).map(s => `<div class="list-item" data-sale-id="${s.id}" style="cursor:pointer"><div class="li-icon" style="background:var(--sage-bg);color:var(--sage)">🛒</div><div class="li-main"><div class="li-title">${escapeHtml(s.personName || 'ناشناس')}</div><div class="li-sub">${fmtJalali(s.date)} · ${toFa(s.items.length)} آیتم</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><div class="li-badge" style="color:var(--sage);background:var(--sage-bg)">${shortMoney(s.totalPrice)}</div><div style="font-size:9px;color:var(--sage);font-weight:700">سود: ${shortMoney(s.profit || 0)}</div></div></div>`).join('');
+    listEl.querySelectorAll('[data-sale-id]').forEach(el => { el.onclick = () => openSaleInvoiceSheet(el.dataset.saleId); });
+  };
+  renderList('');
+  $('btnQuickSaleMain').onclick = () => openQuickSalePickerSheet();
+  const searchInp = $('salesSearchInput');
+  if(searchInp){ let t = null; searchInp.oninput = (e) => { clearTimeout(t); t = setTimeout(() => renderList(e.target.value), 150); }; }
+}
+function renderInventoryReport(){
+  const host = $('invReportHost');
+  if(!host) return;
+  const items = STATE.inventory || [];
+  const totalItems = items.length;
+  const totalBatches = items.reduce((a, i) => a + itemBatchCount(i), 0);
+  const totalValue = items.reduce((a, i) => a + itemStockValue(i), 0);
+  const totalPotentialRevenue = items.reduce((a, i) => a + (itemQty(i) * (i.price || 0)), 0);
+  const potentialProfit = totalPotentialRevenue - totalValue;
+  const avgProfitPct = totalValue > 0 ? Math.round((potentialProfit / totalValue) * 100) : 0;
+  const needOrder = items.filter(i => itemQty(i) <= (i.minQty || 2)).map(i => ({
+    ...i, currentQty: itemQty(i), minQty: i.minQty || 2, urgency: itemQty(i) <= 0 ? 'critical' : 'low'
+  })).sort((a, b) => (a.urgency === 'critical' ? -1 : 1));
+  const topValue = items.map(i => ({ ...i, value: itemStockValue(i) })).filter(i => i.value > 0).sort((a, b) => b.value - a.value).slice(0, 5);
+  const _soldMap = {};
+  (STATE.services || []).forEach(r => (r.works || []).forEach(w => {
+    if(!w.itemId) return;
+    const it = items.find(x => x.id === w.itemId); if(!it) return;
+    if(!_soldMap[it.id]) _soldMap[it.id] = { id: it.id, name: it.name, qty: 0, soldQty: 0, currentQty: itemQty(it) };
+    _soldMap[it.id].qty += parseFloat(w.qty) || 0; _soldMap[it.id].soldQty = _soldMap[it.id].qty;
+  }));
+  (STATE.sales || []).forEach(sl => (sl.items || []).forEach(x => {
+    const it = items.find(y => y.id === x.itemId); if(!it) return;
+    if(!_soldMap[it.id]) _soldMap[it.id] = { id: it.id, name: it.name, qty: 0, soldQty: 0, currentQty: itemQty(it) };
+    _soldMap[it.id].qty += parseFloat(x.qty) || 0; _soldMap[it.id].soldQty = _soldMap[it.id].qty;
+  }));
+  const topSold = Object.values(_soldMap).filter(x => x.qty > 0).sort((a, b) => b.qty - a.qty).slice(0, 5);
+  host.innerHTML = `
+    <div class="card" style="padding:16px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:900;margin-bottom:12px">📊 خلاصه کلی انبار</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--panel-3);border-radius:12px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--muted);font-weight:700">تعداد کالا</div><div style="font-size:20px;font-weight:900;margin-top:4px">${toFa(totalItems)}</div></div>
+        <div style="background:var(--panel-3);border-radius:12px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--muted);font-weight:700">دسته‌های خرید</div><div style="font-size:20px;font-weight:900;margin-top:4px">${toFa(totalBatches)}</div></div>
+        <div style="background:var(--panel-3);border-radius:12px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--sage);font-weight:700">💰 ارزش انبار</div><div style="font-size:16px;font-weight:900;color:var(--sage);margin-top:4px">${shortMoney(totalValue)}</div></div>
+        <div style="background:var(--panel-3);border-radius:12px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--red-2);font-weight:700">📈 سود بالقوه</div><div style="font-size:16px;font-weight:900;color:var(--red-2);margin-top:4px">${shortMoney(potentialProfit)}</div><div style="font-size:9px;color:var(--muted);margin-top:2px">${toFa(avgProfitPct)}٪</div></div>
+      </div>
+    </div>
+    ${needOrder.length ? `<div class="report-section" style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px"><h4 style="margin:0 0 12px;font-size:12px">⚠️ نیاز به سفارش (${toFa(needOrder.length)})</h4>
+      ${needOrder.slice(0, 8).map(i => `<div class="list-item" data-report-item="${i.id}" style="cursor:pointer"><div class="li-icon" style="background:${i.urgency==='critical'?'var(--red-bg)':'var(--warn-bg)'};color:${i.urgency==='critical'?'var(--red-2)':'var(--warn)'}">${i.urgency==='critical'?'!':'↓'}</div><div class="li-main"><div class="li-title">${escapeHtml(i.name)}</div><div class="li-sub">${qf(i.currentQty)} از ${qf(i.minQty)} ${i.unit}</div></div></div>`).join('')}
+    </div>` : ''}
+    ${topValue.length ? `<div class="report-section" style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px"><h4 style="margin:0 0 12px;font-size:12px">💎 ارزش‌مندترین کالاها</h4>
+      ${topValue.map((i, idx) => `<div class="list-item" data-report-item="${i.id}" style="cursor:pointer"><div class="li-icon">${toFa(idx+1)}</div><div class="li-main"><div class="li-title">${escapeHtml(i.name)}</div></div><div class="li-badge" style="color:var(--warn)">${shortMoney(i.value)}</div></div>`).join('')}
+    </div>` : ''}
+    ${topSold.length ? `<div class="card" style="padding:14px;margin-bottom:12px"><h4 style="font-size:13px;font-weight:900;margin:0 0 10px">🔥 پرفروش‌ترین‌ها</h4>
+      ${topSold.map((i, idx) => `<div class="list-item" data-report-item="${i.id}" style="cursor:pointer">
+        <div class="li-icon" style="background:var(--red-bg);color:var(--red-2)">${toFa(idx + 1)}</div>
+        <div class="li-main"><div class="li-title">${escapeHtml(i.name)}</div>
+        <div class="li-sub">${qf(i.soldQty)} فروش · موجودی: ${qf(i.currentQty)}</div></div>
+      </div>`).join('')}
+    </div>` : ''}
+  `;
+  host.querySelectorAll('[data-report-item]').forEach(el => {
+    el.onclick = () => openItemSheet(el.dataset.reportItem);
+  });
+}
+
+
+function renderPeopleSales(){
+  const host = $('peopleSalesHost'); if(!host) return;
+  const sales = [...(STATE.sales || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const totalRevenue = sales.reduce((a, s) => a + (s.totalPrice || 0), 0);
+  const totalProfit = sales.reduce((a, s) => a + (s.profit || 0), 0);
+  const today = todayJalali();
+  const todaySales = sales.filter(s => sameJalaliDay(s.date, today));
+  const todayRevenue = todaySales.reduce((a, s) => a + (s.totalPrice || 0), 0);
+  host.innerHTML = `<div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:var(--panel-3);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9.5px;color:var(--muted);font-weight:700">امروز</div><div style="font-size:12px;font-weight:900;color:var(--sage);margin-top:2px">${todayRevenue ? shortMoney(todayRevenue) : '—'}</div></div>
+      <div style="background:var(--panel-3);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9.5px;color:var(--muted);font-weight:700">کل فروش</div><div style="font-size:12px;font-weight:900;color:var(--sage);margin-top:2px">${shortMoney(totalRevenue)}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;padding-top:8px;border-top:1px dashed var(--line)"><span style="color:var(--muted)">📈 سود کل:</span><b style="color:var(--sage)">${shortMoney(totalProfit)}</b></div>
+  </div>
+  <div class="search-box" style="margin-bottom:10px"><span class="s-ic">🔍</span><input type="search" id="peopleSalesSearch" placeholder="جستجو..." autocomplete="off" style="direction:rtl"></div>
+  <div id="peopleSalesList"></div>`;
+  const renderList = (query) => {
+    const q = normalizeFa(query || '');
+    const filtered = !q ? sales : sales.filter(s => normalizeFa(s.personName || '').includes(q) || (s.items || []).some(it => normalizeFa(it.itemName || '').includes(q)));
+    const listEl = $('peopleSalesList');
+    if(!filtered.length){ listEl.innerHTML = '<div class="empty-state"><div class="s">موردی یافت نشد</div></div>'; return; }
+    listEl.innerHTML = filtered.slice(0, 100).map(s => `<div class="list-item" data-psale-id="${s.id}" style="cursor:pointer"><div class="li-icon" style="background:${s.personId ? 'var(--sage-bg)' : 'var(--panel-3)'};color:${s.personId ? 'var(--sage)' : 'var(--muted)'}">${s.personId ? '👤' : '❓'}</div><div class="li-main"><div class="li-title">${escapeHtml(s.personName || 'ناشناس')}</div><div class="li-sub">${fmtJalali(s.date)} · ${toFa(s.items.length)} آیتم</div></div><div class="li-badge" style="color:var(--sage);background:var(--sage-bg)">${shortMoney(s.totalPrice)}</div></div>`).join('');
+    listEl.querySelectorAll('[data-psale-id]').forEach(el => { el.onclick = () => openSaleInvoiceSheet(el.dataset.psaleId); });
+  };
+  renderList('');
+  const searchInp = $('peopleSalesSearch');
+  if(searchInp){ let t = null; searchInp.oninput = (e) => { clearTimeout(t); t = setTimeout(() => renderList(e.target.value), 150); }; }
+}
+
+
+
+function openAddBatchSheet(itemId){
+  const it = STATE.inventory.find(x => x.id === itemId);
+  if(!it) return;
+  $('sheetTitle').textContent = 'ثبت خرید جدید';
+  const body = $('sheetBody');
+  const avgCost = itemAvgCost(it);
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px"><div style="font-size:11px;color:var(--muted);font-weight:700">کالا</div>
+      <div style="font-size:14px;font-weight:900;margin-top:2px">${escapeHtml(it.name)}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">${escapeHtml(it.cat)} · ${it.unit}</div></div>
+    <div style="background:var(--panel-3);border-radius:12px;padding:10px;margin-bottom:14px;text-align:center">
+      <div style="font-size:10px;color:var(--muted);font-weight:700">میانگین خرید فعلی</div>
+      <div style="font-size:15px;font-weight:900;margin-top:2px">${avgCost ? money(avgCost) : '—'}</div></div>
+    ${jcalHTML('batchDate', todayJalali(), 'تاریخ خرید')}
+    <div class="row2">
+      <div class="field"><label>📦 تعداد (${it.unit})</label><input type="text" inputmode="decimal" id="bQty" placeholder="۱۰"></div>
+      <div class="field"><label>💰 قیمت خرید (تومان)</label><input type="text" inputmode="numeric" id="bCost" value="${avgCost ? thousands(avgCost) : ''}"></div>
+    </div>
+    <div class="field"><label>📄 شماره فاکتور (اختیاری)</label><input type="text" id="bInvoice" placeholder="مثلاً ۱۲۳۴۵"></div>
+    <div class="field"><label>🏪 تأمین‌کننده (اختیاری)</label><input type="text" id="bSupplier" placeholder="مثلاً فروشگاه شل"></div>
+    <div id="priceSuggestBox" style="margin-top:14px;display:none">
+      <div style="background:var(--sage-bg);border:1px solid rgba(90,232,150,.3);border-radius:12px;padding:12px">
+        <div style="font-size:11px;font-weight:800;color:var(--sage);margin-bottom:6px">💡 قیمت فروش پیشنهادی (${toFa(STATE.settings.profitPercent || 30)}٪ سود)</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div style="font-size:15px;font-weight:900" id="suggestPrice">—</div>
+          <button type="button" class="btn btn-sage btn-sm" id="btnUseSuggest">استفاده</button>
+        </div>
+      </div>
+    </div>
+    <div class="row2" style="margin-top:16px">
+      <button class="btn btn-primary" id="btnSaveBatch">💾 ثبت خرید</button>
+      <button class="btn btn-ghost" id="btnCancelBatch">انصراف</button>
+    </div>`;
+  bindJcal('batchDate'); commaInput($('bQty')); commaInput($('bCost'));
+  const updateSuggest = () => {
+    const cost = toNum($('bCost').value); const box = $('priceSuggestBox'); const suggestEl = $('suggestPrice');
+    if(!box || !suggestEl) return;
+    if(cost > 0){
+      const profitPct = STATE.settings.profitPercent || 30;
+      const suggested = Math.round(cost * (1 + profitPct / 100) / 1000) * 1000;
+      suggestEl.textContent = money(suggested); box.style.display = 'block'; box.dataset.suggested = suggested;
+    } else box.style.display = 'none';
+  };
+  $('bCost').addEventListener('input', updateSuggest); updateSuggest();
+  const btnUse = $('btnUseSuggest');
+  if(btnUse) btnUse.onclick = () => {
+    const suggested = toNum($('priceSuggestBox').dataset.suggested);
+    if(suggested > 0){ it.price = suggested; saveState(); showToast('قیمت فروش به‌روز شد: ' + money(suggested), '✓'); closeSheet(); openItemSheet(it.id); }
+  };
+  $('btnSaveBatch').onclick = () => {
+    const qty = toDec($('bQty').value); const cost = toNum($('bCost').value);
+    if(qty <= 0){ showToast('تعداد را وارد کنید', '⚠️'); return; }
+    if(cost <= 0){ showToast('قیمت خرید را وارد کنید', '⚠️'); return; }
+    addBatch(it, qty, cost, jcalGet('batchDate'), $('bSupplier').value.trim() || null, $('bInvoice').value.trim() || null);
+    saveState(); showToast(`✅ ${qf(qty)} ${it.unit} به انبار اضافه شد`, '✓');
+    closeSheet(); renderInventory(); setTimeout(() => openItemSheet(it.id), 100);
+  };
+  $('btnCancelBatch').onclick = () => { closeSheet(); setTimeout(() => openItemSheet(itemId), 100); };
+  $('sheetOverlay').classList.add('show');
+}
+
+function openWasteSheet(itemId){
+  const it = itemId ? STATE.inventory.find(x => x.id === itemId) : null;
+  if(!it){ showToast('کالا پیدا نشد', '⚠️'); return; }
+  const qty = itemQty(it);
+  if(qty <= 0){ showToast('این کالا موجودی ندارد', '⚠️'); return; }
+  $('sheetTitle').textContent = 'ثبت ضایعات/مصرف';
+  const body = $('sheetBody');
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px"><div style="font-size:11px;color:var(--muted);font-weight:700">کالا</div>
+      <div style="font-size:14px;font-weight:900;margin-top:2px">${escapeHtml(it.name)}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">موجودی فعلی: ${qf(qty)} ${it.unit}</div></div>
+    <div class="field"><label>📋 نوع ضایعات</label>
+      <div class="seg" id="wasteTypeSeg" style="margin-bottom:10px">
+        <button data-wt="spill" class="active">🛢️ ریختن</button>
+        <button data-wt="break">💥 شکستن</button>
+        <button data-wt="internal">🏠 مصرف داخلی</button>
+        <button data-wt="lost">❓ گمشده</button>
+      </div></div>
+    <div class="field"><label>📦 مقدار (${it.unit})</label><input type="text" inputmode="decimal" id="wQty" placeholder="مثلاً ۱"></div>
+    ${jcalHTML('wasteDate', todayJalali(), 'تاریخ')}
+    <div class="field"><label>📝 توضیح (اختیاری)</label><input type="text" id="wNote" placeholder="توضیح"></div>
+    <div id="wastePreview" style="margin-bottom:14px"></div>
+    <div class="row2"><button class="btn btn-warn" id="btnSaveWaste">🗑️ ثبت ضایعات</button><button class="btn btn-ghost" id="btnCancelWaste">انصراف</button></div>`;
+  bindJcal('wasteDate'); commaInput($('wQty'));
+  let wasteType = 'spill';
+  document.querySelectorAll('#wasteTypeSeg [data-wt]').forEach(b => {
+    b.onclick = () => { wasteType = b.dataset.wt; document.querySelectorAll('#wasteTypeSeg [data-wt]').forEach(x => x.classList.toggle('active', x === b)); };
+  });
+  const updatePreview = () => {
+    const q = toDec($('wQty').value); const preview = $('wastePreview');
+    if(!preview) return;
+    if(q <= 0){ preview.innerHTML = ''; return; }
+    if(q > qty){ preview.innerHTML = `<div class="owner-new">⚠️ حداکثر ${qf(qty)} ${it.unit}</div>`; return; }
+    const tempItem = JSON.parse(JSON.stringify(it));
+    const result = consumeFIFO(tempItem, q);
+    preview.innerHTML = `<div style="background:var(--warn-bg);border:1px solid rgba(255,176,32,.3);border-radius:12px;padding:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--warn);margin-bottom:6px">💰 ارزش ضایعات</div>
+      <div style="font-size:15px;font-weight:900">${money(result.actualCost)}</div></div>`;
+  };
+  $('wQty').addEventListener('input', updatePreview);
+  $('btnSaveWaste').onclick = () => {
+    const q = toDec($('wQty').value);
+    if(q <= 0){ showToast('مقدار را وارد کنید', '⚠️'); return; }
+    if(q > qty){ showToast('مقدار بیشتر از موجودی است', '⚠️'); return; }
+    const typeLabels = { spill: '🛢️ ریختن', break: '💥 شکستن', internal: '🏠 مصرف داخلی', lost: '❓ گمشده' };
+    const result = consumeFIFO(it, q);
+    const logEntry = STATE.inventoryLog[0];
+    if(logEntry && logEntry.action === 'consume'){
+      logEntry.action = 'waste';
+      logEntry.details.wasteType = wasteType;
+      logEntry.details.wasteLabel = typeLabels[wasteType];
+      logEntry.details.note = $('wNote').value.trim();
+      logEntry.date = jcalGet('wasteDate');
+    }
+    saveState(); showToast(`✅ ${qf(q)} ${it.unit} به عنوان ضایعات ثبت شد`, '✓');
+    closeSheet(); renderInventory(); setTimeout(() => openItemSheet(it.id), 100);
+  };
+  $('btnCancelWaste').onclick = () => { closeSheet(); setTimeout(() => openItemSheet(itemId), 100); };
+  $('sheetOverlay').classList.add('show');
+}
+
+function openInventoryLogSheet(itemId){
+  const logs = (STATE.inventoryLog || []).filter(l => !itemId || l.itemId === itemId);
+  const item = itemId ? STATE.inventory.find(x => x.id === itemId) : null;
+  $('sheetTitle').textContent = item ? `تاریخچه ${item.name}` : 'تاریخچه تغییرات انبار';
+  const body = $('sheetBody');
+  if(!logs.length){
+    body.innerHTML = `<div class="empty-state"><div class="ic">📝</div><div class="t">تاریخچه‌ای ثبت نشده</div></div>`;
+    $('sheetOverlay').classList.add('show'); return;
+  }
+  body.innerHTML = `<div style="background:var(--panel-3);border-radius:12px;padding:10px;margin-bottom:14px;text-align:center">
+  <div style="font-size:11px;color:var(--muted);font-weight:700">تعداد تغییرات</div>
+  <div style="font-size:16px;font-weight:900;margin-top:2px">${toFa(logs.length)}</div>
+</div>
+<div style="max-height:60vh;overflow-y:auto">
+${logs.map(log => {
+  const d = log.details || {};
+  let title = '';
+  let detail = '';
+  let color = 'var(--paper)';
+  let icon = '•';
+  
+  if (log.action === 'purchase') {
+    title = 'خرید'; icon = '💰'; color = 'var(--sage)';
+    detail = `${qf(d.qty || 0)} واحد × ${shortMoney(d.cost || 0)}`;
+  } else if (log.action === 'sale') {
+    title = 'فروش'; icon = '🛒'; color = 'var(--sage)';
+    detail = `${money(d.totalPrice || 0)}`;
+  } else if (log.action === 'consume') {
+    title = 'مصرف در سرویس'; icon = '📤'; color = 'var(--warn)';
+    detail = `${qf(d.qty || 0)} واحد`;
+  } else if (log.action === 'waste') {
+    title = 'ضایعات'; icon = '🗑️'; color = 'var(--red-2)';
+    detail = `${d.wasteLabel || 'ضایعات'} · ${qf(d.qty || 0)} واحد`;
+  } else if (log.action === 'add') {
+    title = 'افزودن کالا'; icon = '➕'; color = 'var(--sage)';
+    detail = `قیمت: ${shortMoney(d.price || 0)}`;
+  } else if (log.action === 'edit') {
+    title = 'ویرایش کالا'; icon = '✏️'; color = 'var(--paper)';
+    detail = `قیمت: ${shortMoney(d.price || 0)}`;
+  } else if (log.action === 'delete') {
+    title = 'حذف کالا'; icon = '🗑️'; color = 'var(--red-2)';
+    detail = `موجودی نهایی: ${qf(d.finalQty || 0)}`;
+  } else {
+    title = log.action || 'تغییر';
+    detail = '';
+  }
+  
+  const dateStr = log.date ? fmtJalali(log.date) : '';
+  const timeStr = log.at ? new Date(log.at).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' }) : '';
+  
+  return `<div style="background:var(--panel-3);border-radius:10px;padding:8px 12px;margin-bottom:6px;border-right:3px solid ${color}">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+      <span>${icon}</span>
+      <span style="font-size:11px;font-weight:900;color:${color}">${title}</span>
+      ${!item ? `<span style="font-size:9.5px;color:var(--muted)">${escapeHtml(log.itemName || '')}</span>` : ''}
+      <span style="margin-right:auto;font-size:9px;color:var(--muted)">${dateStr}${timeStr ? ' · ' + timeStr : ''}</span>
+    </div>
+    <div style="font-size:10.5px;color:var(--paper);font-weight:700">${escapeHtml(detail)}</div>
+  </div>`;
+}).join('')}</div>`;
+  $('sheetOverlay').classList.add('show');
+}
+
+function openInventoryBackupSheet(){
+  $('sheetTitle').textContent = 'پشتیبان انبار';
+  const body = $('sheetBody');
+  const itemCount = STATE.inventory.length;
+  const batchCount = STATE.inventory.reduce((a, i) => a + itemBatchCount(i), 0);
+  const totalValue = STATE.inventory.reduce((a, i) => a + itemStockValue(i), 0);
+  body.innerHTML = `
+    <div style="background:var(--panel-3);border-radius:12px;padding:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:10px;color:var(--muted);font-weight:700">وضعیت فعلی انبار</div>
+      <div style="font-size:13px;font-weight:900;margin-top:6px">${toFa(itemCount)} کالا · ${toFa(batchCount)} دسته</div>
+      <div style="font-size:12px;font-weight:800;color:var(--sage);margin-top:4px">ارزش کل: ${money(totalValue)}</div>
+    </div>
+    <button class="btn btn-sage btn-block" id="btnExportInvBackup" style="margin-bottom:10px">📤 دانلود پشتیبان انبار (JSON)</button>
+    <button class="btn btn-primary btn-block" id="btnImportInvBackup" style="margin-bottom:10px">📥 بارگذاری از فایل</button>
+    <div class="hint" style="text-align:center;font-size:10px;line-height:1.7;margin-top:12px">💡 فقط انبار و تاریخچه</div>`;
+  $('btnExportInvBackup').onclick = () => {
+    const backup = { version:'2.0', exportedAt:new Date().toISOString(), inventory:STATE.inventory, inventoryLog:STATE.inventoryLog||[], cats:STATE.cats };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'inventory-backup.json'; a.click();
+    showToast('پشتیبان دانلود شد', '📥');
+  };
+  $('btnImportInvBackup').onclick = () => {
+    const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if(!data.inventory || !Array.isArray(data.inventory)){ showToast('فایل معتبر نیست', '⚠️'); return; }
+          if(!confirm('اطلاعات فعلی انبار جایگزین می‌شود. ادامه؟')) return;
+          STATE.inventory = data.inventory;
+          STATE.inventoryLog = data.inventoryLog || [];
+          if(data.cats) STATE.cats = data.cats;
+          migrateInventoryToFIFO(); saveState(); closeSheet(); renderInventory();
+          showToast('پشتیبان بازیابی شد', '✅');
+        } catch(err){ showToast('خطا: ' + err.message, '⚠️'); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+  $('sheetOverlay').classList.add('show');
+}
+
+
+
 function commaInput(el){
   if(!el) return;
   el.addEventListener('input',()=>{ const n=toNum(el.value); el.value=n?thousands(n):''; });
@@ -2935,6 +3786,294 @@ function extraChips(){
   }
   return h;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   بخش آیتم‌های فروش در فرم سرویس
+   ══════════════════════════════════════════════════════════════ */
+function renderSaleItemsSection(){
+  const d = wizard.data;
+  const items = d.saleItems || [];
+  const totalSalePrice = items.reduce((sum, i) => sum + (Number(i.price) * Number(i.qty)), 0);
+  const discount = Number(d.saleDiscount) || 0;
+  const finalSaleTotal = Math.max(0, totalSalePrice - discount);
+
+  return `
+    <div class="section-title" style="margin:16px 0 10px">
+      <span class="ic">🛒</span> فروش کالا (اضافه بر سرویس)
+      ${items.length ? `<span style="font-size:10px;color:var(--sage);margin-right:auto;font-weight:800">${toFa(items.length)} آیتم · ${money(finalSaleTotal)}</span>` : ''}
+    </div>
+
+    ${items.length === 0 ? `
+    <div class="hint" style="margin-bottom:10px">
+      اگر مشتری کالایی جدا از سرویس می‌خواهد، از دکمه زیر اضافه کنید
+    </div>
+    ` : ''}
+
+    <div id="saleItemsList">
+      ${items.length ? items.map((item, idx) => {
+        const inv = STATE.inventory.find(x => x.id === item.itemId);
+        const itemTotal = Number(item.price) * Number(item.qty);
+        return `
+          <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--sage-bg);color:var(--sage);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📦</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:800;color:var(--paper)">${escapeHtml(item.name || (inv ? inv.name : ''))}</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:2px">${money(item.price)}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;background:var(--panel-3);border-radius:8px;padding:4px">
+                <button class="inv-qty-btn sub" data-sale-qty-minus="${idx}" style="width:24px;height:24px;font-size:14px">−</button>
+                <span style="font-size:13px;font-weight:900;min-width:24px;text-align:center;color:var(--paper)">${qf(item.qty)}</span>
+                <button class="inv-qty-btn add" data-sale-qty-plus="${idx}" style="width:24px;height:24px;font-size:14px">+</button>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                <div style="font-size:12px;font-weight:900;color:var(--sage)">${money(itemTotal)}</div>
+                <button class="inv-qty-btn" data-del-sale-item="${idx}" style="width:22px;height:22px;font-size:10px;background:var(--red-bg);color:var(--red-2)">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') : ''}
+    </div>
+
+    <button class="btn btn-sage btn-block btn-sm" id="btnAddSaleItem" style="margin-top:6px">
+      ➕ ${items.length === 0 ? 'افزودن کالا به فروش' : 'افزودن کالاهای بیشتر'}
+    </button>
+
+    ${items.length ? `
+    <div class="field" style="margin-top:12px;margin-bottom:8px">
+      <label>🏷️ تخفیف فروش (تومان)</label>
+      <input type="text" inputmode="numeric" id="saleDiscount" placeholder="۰" value="${discount ? thousands(discount) : ''}">
+      <div class="chip-row" style="margin-top:6px">
+        <span class="chip chip-sm" data-discount="5">۵٪</span>
+        <span class="chip chip-sm" data-discount="10">۱۰٪</span>
+        <span class="chip chip-sm" data-discount="15">۱۵٪</span>
+        <span class="chip chip-sm" data-discount="0">حذف</span>
+      </div>
+    </div>
+    ` : ''}
+
+    ${items.length && totalSalePrice > 0 ? `
+    <div style="background:var(--sage-bg);border:1px solid rgba(90,232,150,.25);border-radius:12px;padding:10px 12px;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:var(--sage);font-weight:800">💰 جمع فروش (${toFa(items.length)} آیتم)</span>
+        <span style="font-size:14px;font-weight:900;color:var(--sage)">${money(finalSaleTotal)}</span>
+      </div>
+    </div>
+    ` : ''}
+  `;
+}
+
+function rebindSaleSectionEvents(){
+  const sec = $('saleItemsSection');
+  if(!sec) return;
+  const d = wizard.data;
+
+  const btnAdd = $('btnAddSaleItem');
+  if(btnAdd) btnAdd.onclick = () => openAddSaleItemSheet();
+
+  sec.querySelectorAll('[data-del-sale-item]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.delSaleItem);
+      d.saleItems.splice(idx, 1);
+      sec.innerHTML = renderSaleItemsSection();
+      rebindSaleSectionEvents();
+      try { renderLiveTotal(); } catch(e){}
+    };
+  });
+
+  sec.querySelectorAll('[data-sale-qty-plus]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.saleQtyPlus);
+      const item = d.saleItems[idx];
+      const inv = STATE.inventory.find(x => x.id === item.itemId);
+      const maxQty = itemQty(inv);
+      if (item.qty < maxQty) {
+        item.qty++;
+        sec.innerHTML = renderSaleItemsSection();
+        rebindSaleSectionEvents();
+        try { renderLiveTotal(); } catch(e){}
+      } else {
+        showToast('حداکثر موجودی: ' + maxQty, '⚠️');
+      }
+    };
+  });
+
+  sec.querySelectorAll('[data-sale-qty-minus]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.saleQtyMinus);
+      const item = d.saleItems[idx];
+      if (item.qty > 1) {
+        item.qty--;
+        sec.innerHTML = renderSaleItemsSection();
+        rebindSaleSectionEvents();
+        try { renderLiveTotal(); } catch(e){}
+      } else {
+        showToast('حداقل تعداد ۱ است', '⚠️');
+      }
+    };
+  });
+
+  const discountInput = $('saleDiscount');
+  if(discountInput){
+    commaInput(discountInput);
+    discountInput.oninput = () => {
+      d.saleDiscount = toNum(discountInput.value);
+      try { renderLiveTotal(); } catch(e){}
+    };
+  }
+
+  sec.querySelectorAll('[data-discount]').forEach(chip => {
+    chip.onclick = () => {
+      const pct = parseInt(chip.dataset.discount);
+      if (pct === 0) {
+        d.saleDiscount = 0;
+        if ($('saleDiscount')) $('saleDiscount').value = '';
+      } else {
+        const totalSalePrice = (d.saleItems || []).reduce((a, i) => a + (Number(i.price) * Number(i.qty)), 0);
+        d.saleDiscount = Math.round(totalSalePrice * pct / 100);
+        if ($('saleDiscount')) $('saleDiscount').value = thousands(d.saleDiscount);
+      }
+      try { renderLiveTotal(); } catch(e){}
+    };
+  });
+}
+
+function openAddSaleItemSheet(){
+  const items = STATE.inventory.filter(i => itemQty(i) > 0);
+  if(!items.length){
+    showToast('کالایی در انبار موجود نیست', '⚠️');
+    return;
+  }
+
+  $('sheetTitle').textContent = 'انتخاب کالا برای فروش';
+  const body = $('sheetBody');
+  const selected = {};
+
+  body.innerHTML = `
+    <div class="search-box" style="margin-bottom:12px">
+      <span class="s-ic">🔍</span>
+      <input type="search" id="saleMultiSearch" placeholder="جستجوی کالا..." autocomplete="off" style="direction:rtl">
+    </div>
+
+    <div id="saleMultiFilter" class="seg" style="margin-bottom:12px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px">
+      <button data-mcat="" class="active" style="flex:0 0 auto;min-width:auto;padding:8px 14px">همه</button>
+      ${STATE.cats.map(c => `<button data-mcat="${escapeHtml(c.name)}" style="flex:0 0 auto;min-width:auto;padding:8px 14px">${escapeHtml(c.name)}</button>`).join('')}
+    </div>
+
+    <div id="saleMultiList" style="max-height:45vh;overflow-y:auto"></div>
+
+    <div id="saleMultiFooter" style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:none">
+      <div style="background:var(--sage-bg);border:1px solid rgba(90,232,150,.3);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;font-weight:800;color:var(--sage)" id="saleSelectedCount">۰ کالا</span>
+        <button class="btn btn-sage btn-sm" id="btnConfirmSaleSelect" style="padding:8px 14px">✓ افزودن به فروش</button>
+      </div>
+    </div>
+  `;
+
+  let currentCat = '';
+  let currentSearch = '';
+
+  const renderList = () => {
+    const q = normalizeFa(currentSearch);
+    const filtered = items.filter(i => {
+      if(currentCat && i.cat !== currentCat) return false;
+      if(q && !normalizeFa(i.name).includes(q) && !normalizeFa(i.cat).includes(q)) return false;
+      return true;
+    });
+
+    const listEl = $('saleMultiList');
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="empty-state"><div class="s">کالایی یافت نشد</div></div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(i => {
+      const qty = itemQty(i);
+      const isSel = !!selected[i.id];
+      return `
+        <div class="list-item" data-multi-item="${i.id}" style="cursor:pointer;${isSel ? 'border-color:var(--sage);background:var(--sage-bg)' : ''}">
+          <div class="li-icon" style="background:${isSel ? 'var(--sage-bg)' : 'var(--panel-3)'};color:${isSel ? 'var(--sage)' : 'var(--paper)'};${isSel ? 'border:1px solid var(--sage)' : ''}">
+            ${isSel ? '✓' : (i.unit === 'لیتر' ? '🛢️' : '📦')}
+          </div>
+          <div class="li-main">
+            <div class="li-title">${escapeHtml(i.name)}</div>
+            <div class="li-sub">${escapeHtml(i.cat)} · موجودی: ${qf(qty)} ${i.unit}</div>
+          </div>
+          <div class="li-badge" style="color:var(--sage)">${i.price ? shortMoney(i.price) : '—'}</div>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('[data-multi-item]').forEach(el => {
+      el.onclick = () => {
+        const id = el.dataset.multiItem;
+        if(selected[id]) delete selected[id];
+        else {
+          const inv = items.find(x => x.id === id);
+          selected[id] = {
+            itemId: id, name: inv.name, qty: 1, price: inv.price || 0,
+            unit: inv.unit, maxQty: itemQty(inv)
+          };
+        }
+        updateFooter();
+        renderList();
+      };
+    });
+  };
+
+  const updateFooter = () => {
+    const count = Object.keys(selected).length;
+    const footer = $('saleMultiFooter');
+    if(footer) footer.style.display = count > 0 ? 'block' : 'none';
+    const cntEl = $('saleSelectedCount');
+    if(cntEl) cntEl.textContent = `${toFa(count)} کالا`;
+  };
+
+  $('saleMultiSearch').oninput = (e) => { currentSearch = e.target.value; renderList(); };
+
+  document.querySelectorAll('#saleMultiFilter [data-mcat]').forEach(b => {
+    b.onclick = () => {
+      currentCat = b.dataset.mcat;
+      document.querySelectorAll('#saleMultiFilter [data-mcat]').forEach(x => x.classList.toggle('active', x === b));
+      renderList();
+    };
+  });
+
+  renderList();
+
+  setTimeout(() => {
+    const btn = $('btnConfirmSaleSelect');
+    if(btn) btn.onclick = () => {
+      const selectedItems = Object.values(selected);
+      if(!selectedItems.length) return;
+
+      if(!wizard.data.saleItems) wizard.data.saleItems = [];
+      selectedItems.forEach(si => {
+        const existing = wizard.data.saleItems.find(x => x.itemId === si.itemId);
+        if(existing){
+          existing.qty += si.qty;
+        } else {
+          wizard.data.saleItems.push({
+            itemId: si.itemId, name: si.name, qty: si.qty, price: si.price, unit: si.unit
+          });
+        }
+      });
+
+      closeSheet();
+      const sec = $('saleItemsSection');
+      if(sec){
+        sec.innerHTML = renderSaleItemsSection();
+        rebindSaleSectionEvents();
+      }
+      try { renderLiveTotal(); } catch(e){}
+      showToast(`✅ ${toFa(selectedItems.length)} کالا اضافه شد`, '✓');
+    };
+  }, 50);
+
+  $('sheetOverlay').classList.add('show');
+}
+
 function renderFormStage(host){
   const d=wizard.data;
   // اطلاعات سرویس قبلی همین پلاک
@@ -2987,6 +4126,8 @@ function renderFormStage(host){
         <input type="text" id="fWorkCustom" class="inp" placeholder="کار دیگر..." style="flex:1">
         <button type="button" class="btn btn-sm" id="btnAddWork" style="padding:11px 16px">➕</button>
       </div>
+
+      <div id="saleItemsSection"></div>
 
       <div class="field" style="margin-top:14px"><label>توضیحات و یادداشت تکمیلی</label>
         <textarea id="fNote" style="min-height:60px;font-family:inherit;direction:rtl;text-align:right;font-size:13px" placeholder="توضیح اضافه...">${escapeHtml(d.note)}</textarea></div>
@@ -3083,6 +4224,12 @@ function renderFormStage(host){
     d.extraSel[n]=true; $('fWorkCustom').value=''; refreshChips();
   };
   $('btnAddWork').onclick=addWork;
+  const saleSection = $('saleItemsSection');
+  if (saleSection) {
+    saleSection.innerHTML = renderSaleItemsSection();
+    rebindSaleSectionEvents();
+  }
+
   $('fWorkCustom').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); addWork(); } };
   const wh=$('partsArea'), rerender=()=>{ wh.innerHTML=STATE.cats.map(workRow).join(''); upgradeWorkSelects(wh); scanAndAttachMoneyInputs(); };
   wh.onclick=e=>{
@@ -3129,39 +4276,126 @@ function collectForm(){
 function saveService(){
   collectForm(); const d=wizard.data;
   if(!d.kmCurrent){ showToast('کیلومتر فعلی را وارد کنید','⚠️'); return; }
-  const old=wizard.editId?STATE.services.find(s=>s.id===wizard.editId):null;
+  
+  const old = wizard.editId ? STATE.services.find(s=>s.id===wizard.editId) : null;
   const works=[];
-  let stockWarned = false;
+  
   for(const c of STATE.cats){
-    const w=d.works[c.name]; if(!w||!w.on) continue;
-    const it=STATE.inventory.find(x=>x.id===w.itemId); const q=toDec(w.qty);
-    const av=it?it.qty+(old?old.works.filter(x=>x.itemId===it.id).reduce((a,x)=>a+(x.qty||0),0):0):0;
-    if(it&&!q){ showToast(`مقدار «${c.name}» را وارد کنید`,'⚠️'); return; }
-    if(it&&q>av){
-      if(!confirm(`موجودی «${it.name}» (${qf(av)} ${it.unit}) کمتر از مقدار واردشده است. ادامه می‌دهید؟`)) return;
-      stockWarned = true;                                 // علامت‌گذاری
+    const w = d.works[c.name]; 
+    if(!w || !w.on) continue;
+    const it = STATE.inventory.find(x => x.id === w.itemId); 
+    const q = toDec(w.qty);
+    if(it && !q){ showToast(`مقدار «${c.name}» را وارد کنید`,'⚠️'); return; }
+    if(it){
+      const availableQty = itemQty(it) + (old ? old.works.filter(x=>x.itemId===it.id).reduce((a,x)=>a+(x.qty||0),0) : 0);
+      if(q > availableQty){
+        const unit = it.unit || '';
+        if(!confirm(`⚠️ موجودی «${it.name}» کافی نیست.\nموجودی فعلی: ${qf(availableQty)} ${unit}\nنیاز: ${qf(q)} ${unit}\n\nادامه می‌دهید؟`)) return;
+      }
     }
-    const ow=(it&&old)?old.works.find(x=>x.itemId===it.id):null;
-    const mp=toNum(w.price)||0, ip=it?(mp>0?mp:((ow&&ow.ip!==undefined)?ow.ip:(it.price||0))):0, ic=it?((ow&&ow.ic!==undefined)?ow.ic:(it.cost||0)):0;
-    works.push({cat:c.name,itemId:it?it.id:'',name:((it?it.name:'')+(w.name?((it?' — ':'')+w.name):'')).trim(),note:w.name||'',qty:q,unit:q?(it?it.unit:c.unit):'',price:toNum(w.price)||0,ip:ip,ic:ic});
+    works.push({
+      cat: c.name,
+      itemId: it ? it.id : '',
+      name: ((it?it.name:'') + (w.name?((it?' — ':'')+w.name):'')).trim(),
+      note: w.name || '',
+      qty: q,
+      unit: q ? (it ? it.unit : c.unit) : '',
+      price: toNum(w.price) || 0,
+      ip: it ? (toNum(w.price) > 0 ? toNum(w.price) : (it.price || 0)) : 0,
+      actualCost: 0,
+      batchesUsed: []
+    });
   }
-  STATE.quick.works.concat(d.extraCustom).forEach(n=>{ if(d.extraSel[n]&&!works.some(x=>x.cat===n)) works.push({cat:n,itemId:'',name:'',qty:0,unit:'',price:(d.extraPrice&&d.extraPrice[n])||0}); });
-  if(!works.length){ showToast('حداقل یک کار انجام‌شده را انتخاب کنید','⚠️'); return; }
-  const p=ensurePerson(), plate=currentPlateObj(), now=Date.now();
-  const rec={id:uid(),plate,plateKey:plateKey(plate),personId:p.id,date:d.date,oilType:d.oilType,kmCurrent:d.kmCurrent,kmNext:d.kmNext,works,note:d.note||'',payment:null,createdBy:STATE.settings.displayName||'کاربر',createdAt:now,updatedAt:now};
+  
+  STATE.quick.works.concat(d.extraCustom).forEach(n => { 
+    if(d.extraSel[n] && !works.some(x => x.cat === n)) {
+      works.push({
+        cat: n, itemId: '', name: '', qty: 0, unit: '',
+        price: (d.extraPrice && d.extraPrice[n]) || 0,
+        ip: (d.extraPrice && d.extraPrice[n]) || 0,
+        actualCost: 0,
+        batchesUsed: []
+      }); 
+    }
+  });
+  
+  // فروش‌های همراه سرویس
+  const saleItemsForRecord = [];
+  (d.saleItems || []).forEach(si => {
+    const inv = STATE.inventory.find(x => x.id === si.itemId);
+    if(!inv) return;
+    saleItemsForRecord.push({
+      cat: '🛒 فروش آزاد',
+      itemId: inv.id,
+      name: inv.name,
+      note: '',
+      qty: Number(si.qty),
+      unit: inv.unit,
+      price: Number(si.price),
+      ip: Number(si.price),
+      actualCost: 0,
+      batchesUsed: [],
+      isSale: true
+    });
+  });
+  
+  if(!works.length && !saleItemsForRecord.length){
+    showToast('حداقل یک سرویس یا کالای فروش انتخاب کنید','⚠️');
+    return;
+  }
+  
+  const allWorks = works.concat(saleItemsForRecord);
+  const p = ensurePerson();
+  const plate = currentPlateObj();
+  const now = Date.now();
+  const rec = {
+    id: uid(),
+    plate, plateKey: plateKey(plate),
+    personId: p.id, date: d.date,
+    oilType: d.oilType, kmCurrent: d.kmCurrent, kmNext: d.kmNext,
+    works: allWorks,
+    note: d.note || '',
+    saleDiscount: Number(d.saleDiscount) || 0,
+    payment: null,
+    createdBy: STATE.settings.displayName || 'کاربر',
+    createdAt: now, updatedAt: now
+  };
+  
   if(old){
-    applyStock(old.works,+1);
-    Object.assign(old,{plate:rec.plate,plateKey:rec.plateKey,personId:rec.personId,date:rec.date,oilType:rec.oilType,kmCurrent:rec.kmCurrent,kmNext:rec.kmNext,works,note:rec.note,updatedAt:now});
-    applyStock(works,-1); saveRecord(old);
-    if(stockWarned) showToast('ذخیره شد · توجه: موجودی به صفر رسید','⚠️');
-    else showToast('تغییرات سرویس ذخیره شد');
-    wizard=null; switchTab('dashboard'); renderAll(); return;
+    applyStock(old.works, +1);
+    Object.assign(old, {
+      plate: rec.plate, plateKey: rec.plateKey, personId: rec.personId,
+      date: rec.date, oilType: rec.oilType,
+      kmCurrent: rec.kmCurrent, kmNext: rec.kmNext,
+      works: allWorks, note: rec.note,
+      saleDiscount: rec.saleDiscount,
+      updatedAt: now
+    });
+    const stockResult = applyStock(allWorks, -1);
+    saveRecord(old);
+    if(stockResult.warnings.length > 0){
+      showToast(stockResult.warnings[0].message, '⚠️');
+    } else {
+      showToast('تغییرات سرویس ذخیره شد', '✓');
+    }
+    wizard = null;
+    switchTab('dashboard');
+    renderAll();
+    return;
   }
-  applyStock(works,-1); saveRecord(rec);
-  wizard.recId=rec.id; wizard.stage='pay'; wizard.pay=null;
-  if(stockWarned) showToast('سرویس ثبت شد · توجه: موجودی به صفر رسید','⚠️');
-  else showToast('سرویس ثبت شد؛ پرداخت را مشخص کنید');
-  renderWizard(); renderDashboard();
+  
+  const stockResult = applyStock(allWorks, -1);
+  saveRecord(rec);
+  wizard.recId = rec.id;
+  wizard.stage = 'pay';
+  wizard.pay = null;
+  if(stockResult.warnings.length > 0){
+    showToast(stockResult.warnings[0].message, '⚠️');
+  } else {
+    showToast('سرویس ثبت شد؛ پرداخت را مشخص کنید', '✓');
+  }
+  renderWizard();
+  renderDashboard();
 }
 
 /* ---- مرحله ۳: پرداخت ---- */
@@ -3518,6 +4752,15 @@ let peopleFilter = 'all';   // all | debt | clear
 let peopleSort = 'name';    // name | debt | recent | services
 
 function renderPeople(query){
+  const activeTab = (document.querySelector('#peopleTabSeg button.active') && document.querySelector('#peopleTabSeg button.active').dataset.ptab) || 'list';
+  if(activeTab === 'sales'){
+    if($('peopleListView')) $('peopleListView').style.display = 'none';
+    if($('peopleSalesView')) $('peopleSalesView').style.display = 'block';
+    if(typeof renderPeopleSales === 'function') renderPeopleSales();
+    return;
+  }
+  if($('peopleListView')) $('peopleListView').style.display = 'block';
+  if($('peopleSalesView')) $('peopleSalesView').style.display = 'none';
   const raw = (query||'').trim(), q = toEn(raw), nameQ = normalizeFa(raw);
 
   // آمار کلی برای کارت خلاصه (همیشه روی کل STATE.people)
@@ -3651,6 +4894,15 @@ function openPersonSheet(id){
   body.querySelectorAll('[data-msettle]').forEach(el=>el.onclick=()=>{ const x=STATE.debts.find(v=>v.id===el.dataset.msettle); if(x){ x.settled=true; x.settledAt=Date.now(); saveState(); showToast('بدهی تسویه شد'); renderAll(); openPersonSheet(id); } });
   body.querySelectorAll('[data-mdel]').forEach(el=>el.onclick=()=>{ if(confirm('این بدهی حذف شود؟')){ STATE.debts=STATE.debts.filter(v=>v.id!==el.dataset.mdel); saveState(); renderAll(); openPersonSheet(id); } });
   $('btnAddDebt').onclick=()=>openDebtSheet(id);
+  const btnSale = $('btnAddSaleForPerson');
+  if (btnSale) {
+    btnSale.onclick = () => {
+      closeSheet();
+      setTimeout(() => {
+        openQuickSalePickerSheet(null, p);
+      }, 100);
+    };
+  }
   $('btnSavePerson').onclick=()=>{
     const name=$('pName').value.trim(), phone=normalizeDigits($('pPhone').value,11);
     if(!name||phone.length<10){ showToast('نام و شماره تماس معتبر وارد کنید','⚠️'); return; }
@@ -3744,15 +4996,35 @@ let invSort = 'name';
 let invLowOnly = false;
 
 function renderInventory(){
-  const q = ($('invSearchInput').value||'').trim();
-  if(invCat && !STATE.cats.some(c=>c.name===invCat)) invCat='';
+  const q = ($('invSearchInput').value || '').trim();
+  if(invCat && !STATE.cats.some(c => c.name === invCat)) invCat = '';
 
-  // آمار کلی
+  const invTab = (document.querySelector('#invTabSeg button.active') && document.querySelector('#invTabSeg button.active').dataset.invtab) || 'list';
+  const listView = $('invListView'), reportView = $('invReportView'), salesView = $('invSalesView');
+  if(invTab === 'report'){
+    if(listView) listView.style.display = 'none';
+    if(reportView) reportView.style.display = 'block';
+    if(salesView) salesView.style.display = 'none';
+    if(typeof renderInventoryReport === 'function') renderInventoryReport();
+    return;
+  }
+  if(invTab === 'sales'){
+    if(listView) listView.style.display = 'none';
+    if(reportView) reportView.style.display = 'none';
+    if(salesView) salesView.style.display = 'block';
+    if(typeof renderInventorySales === 'function') renderInventorySales();
+    return;
+  }
+  if(listView) listView.style.display = 'block';
+  if(reportView) reportView.style.display = 'none';
+  if(salesView) salesView.style.display = 'none';
+
   const all = STATE.inventory;
-  const totalQtyLit = all.filter(i=>i.unit==='لیتر').reduce((a,i)=>a+(i.qty||0),0);
-  const totalQtyCnt = all.filter(i=>i.unit==='عدد').reduce((a,i)=>a+(i.qty||0),0);
-  const lowItems = all.filter(i=>(i.qty||0)<=2);
-  const stockValue = all.reduce((a,i)=>a + ((i.cost||0) * (i.qty||0)), 0);
+  const totalQtyLit = all.filter(i => i.unit === 'لیتر').reduce((a, i) => a + itemQty(i), 0);
+  const totalQtyCnt = all.filter(i => i.unit === 'عدد').reduce((a, i) => a + itemQty(i), 0);
+  const lowItems = all.filter(i => itemQty(i) <= (i.minQty || 2));
+  const stockValue = all.reduce((a, i) => a + itemStockValue(i), 0);
+  const totalBatches = all.reduce((a, i) => a + itemBatchCount(i), 0);
 
   const sumEl = $('invSummary');
   if(sumEl){
@@ -3767,19 +5039,20 @@ function renderInventory(){
       <div class="inv-summary-row">
         <div class="is-cell"><div class="is-num warn">${toFa(lowItems.length)}</div><div class="is-lbl">کم‌موجود</div></div>
         <div class="is-div"></div>
-        <div class="is-cell" style="flex:2"><div class="is-num sage" style="font-size:12px">${stockValue ? shortMoney(stockValue) : '—'}</div><div class="is-lbl">ارزش انبار (خرید)</div></div>
+        <div class="is-cell"><div class="is-num sage" style="font-size:12px">${stockValue ? shortMoney(stockValue) : '—'}</div><div class="is-lbl">ارزش انبار (FIFO)</div></div>
+        <div class="is-div"></div>
+        <div class="is-cell"><div class="is-num" style="font-size:12px">${toFa(totalBatches)}</div><div class="is-lbl">دسته خرید</div></div>
       </div>
     `;
   }
 
-  // بنر هشدار
   const lowAlert = $('invLowAlert');
   const lowTxt = $('invLowTxt');
   if(lowAlert && lowTxt){
     if(lowItems.length){
       lowAlert.style.display = 'flex';
-      lowTxt.textContent = `${toFa(lowItems.length)} کالا موجودی کم دارن (≤ ۲)`;
-      lowAlert.onclick = ()=>{
+      lowTxt.textContent = `${toFa(lowItems.length)} کالا موجودی کم دارن`;
+      lowAlert.onclick = () => {
         invLowOnly = true;
         const t = $('invLowOnlyToggle');
         if(t) t.classList.add('active');
@@ -3790,105 +5063,114 @@ function renderInventory(){
     }
   }
 
-  // فیلتر دسته
   const f = $('invCatFilter');
-  f.innerHTML = [{name:''}].concat(STATE.cats).map(c=>`<button type="button" class="${invCat===c.name?'active':''}" data-icat="${escapeHtml(c.name)}">${c.name?escapeHtml(c.name):'همه'}</button>`).join('');
-  f.querySelectorAll('[data-icat]').forEach(b=>b.onclick=()=>{ invCat=b.dataset.icat; renderInventory(); });
+  if(f){
+    f.innerHTML = [{ name: '' }].concat(STATE.cats).map(c =>
+      `<button type="button" class="${invCat === c.name ? 'active' : ''}" data-icat="${escapeHtml(c.name)}">${c.name ? escapeHtml(c.name) : 'همه'}</button>`
+    ).join('');
+    f.querySelectorAll('[data-icat]').forEach(b => b.onclick = () => { invCat = b.dataset.icat; renderInventory(); });
+  }
 
-  // لیست
   const qN = normalizeFa(q);
-  let list = all.filter(i=>{
-    if(invCat && i.cat!==invCat) return false;
-    if(invLowOnly && (i.qty||0) > 2) return false;
+  let list = all.filter(i => {
+    if(invCat && i.cat !== invCat) return false;
+    if(invLowOnly && itemQty(i) > (i.minQty || 2)) return false;
     if(!q) return true;
     return normalizeFa(i.name).includes(qN) || normalizeFa(i.cat).includes(qN);
   });
 
-  // مرتب‌سازی
-  if(invSort === 'qty'){
-    list.sort((a,b)=>(a.qty||0) - (b.qty||0));
-  } else if(invSort === 'price'){
-    list.sort((a,b)=>(b.price||0) - (a.price||0));
-  } else if(invSort === 'profit'){
-    list.sort((a,b)=>((b.price||0)-(b.cost||0)) - ((a.price||0)-(a.cost||0)));
-  } else {
-    list.sort((a,b)=>a.name.localeCompare(b.name,'fa'));
-  }
+  if(invSort === 'qty') list.sort((a, b) => itemQty(a) - itemQty(b));
+  else if(invSort === 'price') list.sort((a, b) => (b.price || 0) - (a.price || 0));
+  else if(invSort === 'profit') list.sort((a, b) => ((b.price || 0) - itemAvgCost(b)) - ((a.price || 0) - itemAvgCost(a)));
+  else if(invSort === 'value') list.sort((a, b) => itemStockValue(b) - itemStockValue(a));
+  else list.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 
   const invListEl = $('invList');
+  if(!invListEl) return;
   if(!list.length){
     invListEl.innerHTML = `<div class="empty-state">
       <div class="ic">📦</div>
-      <div class="t">${all.length?'کالایی یافت نشد':'انبار خالی است'}</div>
-      <div class="s">${all.length?'فیلتر را بردارید یا چیز دیگری جستجو کنید':'اولین کالا را اضافه کنید'}</div>
-      ${!all.length?'<button class="search-empty-btn" id="btnEmptyNewItem">➕ افزودن اولین کالا</button>':''}
+      <div class="t">${all.length ? 'کالایی یافت نشد' : 'انبار خالی است'}</div>
+      <div class="s">${all.length ? 'فیلتر را بردارید یا چیز دیگری جستجو کنید' : 'اولین کالا را اضافه کنید'}</div>
+      ${!all.length ? '<button class="search-empty-btn" id="btnEmptyNewItem">➕ افزودن اولین کالا</button>' : ''}
     </div>`;
     const bE = $('btnEmptyNewItem');
-    if(bE) bE.onclick = ()=>openItemSheet(null);
+    if(bE) bE.onclick = () => openItemSheet(null);
     return;
   }
 
-  invListEl.innerHTML = list.map(i=>{
-    const profit = (i.price||0) - (i.cost||0);
-    const qty = i.qty||0;
-    const qBadge = qty<=0 ? 'pill-red' : (qty<=2 ? 'pill-warn' : '');
+  invListEl.innerHTML = list.map(i => {
+    const qty = itemQty(i);
+    const avgCost = itemAvgCost(i);
+    const stockVal = itemStockValue(i);
+    const batches = itemBatchCount(i);
+    const profitPerUnit = (i.price || 0) - avgCost;
+    const minQty = i.minQty || 2;
+    let qBadgeClass = '', qStatus = '';
+    if(qty <= 0){ qBadgeClass = 'pill-red'; qStatus = 'ناموجود'; }
+    else if(qty <= minQty){ qBadgeClass = 'pill-warn'; qStatus = 'کم‌موجود'; }
+    const iconBg = qty <= 0 ? 'var(--red-bg)' : (qty <= minQty ? 'var(--warn-bg)' : '');
     return `<div class="list-item inv-item-row" data-item="${i.id}">
-      <div class="li-icon">${i.unit==='لیتر'?'🛢️':'📦'}</div>
+      <div class="li-icon" style="background:${iconBg || 'var(--panel-3)'}">${i.unit === 'لیتر' ? '🛢️' : '📦'}</div>
       <div class="li-main">
         <div class="li-title">${escapeHtml(i.name)}</div>
-        <div class="li-sub">${escapeHtml(i.cat)}${i.price?` · ${money(i.price)}`:''}</div>
-        ${profit > 0 ? `<div class="inv-price-row"><span class="pv">سود هر واحد: ${shortMoney(profit)}</span></div>` : (profit < 0 ? `<div class="inv-price-row"><span class="pv" style="color:var(--red-2)">⚠️ ضرر: ${shortMoney(Math.abs(profit))}</span></div>` : '')}
+        <div class="li-sub">
+          ${escapeHtml(i.cat)}
+          ${batches > 0 ? ` · <b style="color:var(--red-2)">📚 ${toFa(batches)} دسته</b>` : ''}
+          ${qStatus ? ` · <b style="color:${qty <= 0 ? 'var(--red-2)' : 'var(--warn)'}">${qStatus}</b>` : ''}
+        </div>
+        <div class="inv-price-row">
+          <span>میانگین خرید: <b>${avgCost ? shortMoney(avgCost) : '—'}</b></span>
+          <span>فروش: <b>${i.price ? shortMoney(i.price) : '—'}</b></span>
+          ${profitPerUnit > 0 ? `<span class="pv">سود: ${shortMoney(profitPerUnit)}</span>` : (profitPerUnit < 0 ? `<span class="pv" style="color:var(--red-2)">⚠️ ضرر</span>` : '')}
+        </div>
+        ${stockVal > 0 ? `<div style="font-size:9.5px;color:var(--muted);margin-top:2px">💰 ارزش انبار: <b style="color:var(--sage)">${shortMoney(stockVal)}</b></div>` : ''}
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-        <div class="li-badge ${qBadge}">${qf(qty)} ${i.unit}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="li-badge ${qBadgeClass}">${qf(qty)} ${i.unit}</div>
         <div class="inv-qty-row" data-stopclick="1">
-          <button class="inv-qty-btn sub" data-qsub="${i.id}" ${qty<=0?'disabled':''}>−</button>
+          <button class="inv-qty-btn sub" data-qsub="${i.id}" ${qty <= 0 ? 'disabled' : ''}>−</button>
           <button class="inv-qty-btn add" data-qadd="${i.id}">+</button>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  // bind آیتم باز کردن
-  invListEl.querySelectorAll('[data-item]').forEach(x=>{
-    x.onclick = (e)=>{
+  invListEl.querySelectorAll('[data-item]').forEach(x => {
+    x.onclick = (e) => {
       if(e.target.closest('[data-stopclick]')) return;
       openItemSheet(x.dataset.item);
     };
   });
-  // bind + و -
-  invListEl.querySelectorAll('[data-qadd]').forEach(b=>b.onclick=(e)=>{
+  invListEl.querySelectorAll('[data-qadd]').forEach(b => b.onclick = (e) => {
     e.stopPropagation();
-    const it = STATE.inventory.find(x=>x.id===b.dataset.qadd);
+    const it = STATE.inventory.find(x => x.id === b.dataset.qadd);
     if(!it) return;
-    it.qty = Math.round(((it.qty||0) + 1)*100)/100;
-    saveState(); renderInventory();
-    showToast(`${it.name} +۱`, '➕');
+    addBatch(it, 1, itemAvgCost(it) || (it.price || 0), todayJalali());
+    saveState(); renderInventory(); showToast(it.name + ' +۱', '➕');
   });
-  invListEl.querySelectorAll('[data-qsub]').forEach(b=>b.onclick=(e)=>{
+  invListEl.querySelectorAll('[data-qsub]').forEach(b => b.onclick = (e) => {
     e.stopPropagation();
-    const it = STATE.inventory.find(x=>x.id===b.dataset.qsub);
-    if(!it) return;
-    if((it.qty||0) <= 0) return;
-    it.qty = Math.round(((it.qty||0) - 1)*100)/100;
-    saveState(); renderInventory();
-    showToast(`${it.name} −۱`, '➖');
+    const it = STATE.inventory.find(x => x.id === b.dataset.qsub);
+    if(!it || itemQty(it) <= 0) return;
+    consumeFIFO(it, 1);
+    saveState(); renderInventory(); showToast(it.name + ' −۱', '➖');
   });
 
-  // bind toolbar
   const sSel = $('invSortBtn');
   if(sSel && !sSel._bound){
     sSel._bound = true;
-    sSel.onclick = ()=>{
+    sSel.onclick = () => {
       const options = [
-        {value:'name', label:'🔤 نام'},
-        {value:'qty', label:'📉 موجودی کم'},
-        {value:'price', label:'💰 قیمت بالا'},
-        {value:'profit', label:'📈 بیشترین سود'}
+        { value: 'name', label: '🔤 نام' },
+        { value: 'qty', label: '📉 موجودی کم' },
+        { value: 'price', label: '💰 قیمت فروش' },
+        { value: 'profit', label: '📈 بیشترین سود' },
+        { value: 'value', label: '💎 ارزش انبار' }
       ];
-      openCustomSelect('مرتب‌سازی انبار', options, invSort, (val)=>{
+      openCustomSelect('مرتب‌سازی انبار', options, invSort, (val) => {
         invSort = val;
-        const lab = options.find(o=>o.value===val);
+        const lab = options.find(o => o.value === val);
         if($('invSortLabel') && lab) $('invSortLabel').textContent = lab.label;
         renderInventory();
       });
@@ -3897,84 +5179,191 @@ function renderInventory(){
   const lowToggle = $('invLowOnlyToggle');
   if(lowToggle && !lowToggle._bound){
     lowToggle._bound = true;
-    lowToggle.onclick = ()=>{
+    lowToggle.onclick = () => {
       invLowOnly = !invLowOnly;
       lowToggle.classList.toggle('active', invLowOnly);
       renderInventory();
     };
   }
+  const btnGlobalLog = $('btnShowGlobalLog');
+  if(btnGlobalLog && !btnGlobalLog._bound){
+    btnGlobalLog._bound = true;
+    btnGlobalLog.onclick = () => openInventoryLogSheet(null);
+  }
+  const btnInvBackup = $('btnInvBackup');
+  if(btnInvBackup && !btnInvBackup._bound){
+    btnInvBackup._bound = true;
+    btnInvBackup.onclick = () => openInventoryBackupSheet();
+  }
 }
 
 function openItemSheet(id){
-  const it=id?STATE.inventory.find(x=>x.id===id):null;
-  const c0=STATE.cats[0];
-  const item=it||{id:'',name:'',cat:c0.name,unit:c0.unit,qty:0};
-  $('sheetTitle').textContent=it?'ویرایش کالا':'کالای جدید';
-  const used=it?STATE.services.filter(s=>s.works.some(w=>w.itemId===it.id)):[];
-  $('sheetBody').innerHTML=`
-    <div class="field"><label>نام کالا</label><input type="text" id="iName" placeholder="مثلاً روغن موتور شل ۵W40" value="${escapeHtml(item.name)}"></div>
+  const it = id ? STATE.inventory.find(x => x.id === id) : null;
+  const c0 = STATE.cats[0];
+  const item = it || { id: '', name: '', cat: c0.name, unit: c0.unit, price: 0, minQty: 2, batches: [] };
+  $('sheetTitle').textContent = it ? 'جزئیات کالا' : 'کالای جدید';
+  const body = $('sheetBody');
+  const used = it ? STATE.services.filter(s => s.works.some(w => w.itemId === it.id)) : [];
+  const qty = itemQty(item);
+  const avgCost = itemAvgCost(item);
+  const stockVal = itemStockValue(item);
+  const profitPerUnit = (item.price || 0) - avgCost;
+  body.innerHTML = `
+    ${it ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--panel-3);border-radius:12px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--muted);font-weight:700">موجودی کل</div><div style="font-size:16px;font-weight:900;margin-top:2px">${qf(qty)} ${item.unit}</div></div>
+      <div style="background:var(--panel-3);border-radius:12px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--muted);font-weight:700">میانگین خرید</div><div style="font-size:13px;font-weight:900;margin-top:2px">${avgCost ? shortMoney(avgCost) : '—'}</div></div>
+      <div style="background:var(--panel-3);border-radius:12px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--muted);font-weight:700">ارزش انبار</div><div style="font-size:13px;font-weight:900;color:var(--sage);margin-top:2px">${stockVal ? shortMoney(stockVal) : '—'}</div></div>
+      <div style="background:var(--panel-3);border-radius:12px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--muted);font-weight:700">سود هر واحد</div><div style="font-size:13px;font-weight:900;color:${profitPerUnit >= 0 ? 'var(--sage)' : 'var(--red-2)'};margin-top:2px">${profitPerUnit ? (profitPerUnit > 0 ? '+' : '') + shortMoney(profitPerUnit) : '—'}</div></div>
+    </div>` : ''}
+    <div class="field"><label>نام کالا</label><input type="text" id="iName" placeholder="مثلاً روغن موتور" value="${escapeHtml(item.name)}"></div>
     <div class="row2">
-      <div class="field"><label>دسته</label><select id="iCat">${STATE.cats.map(c=>`<option ${c.name===item.cat?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}</select></div>
-      <div class="field"><label>واحد</label><select id="iUnit"><option ${item.unit==='عدد'?'selected':''}>عدد</option><option ${item.unit==='لیتر'?'selected':''}>لیتر</option></select></div>
+      <div class="field"><label>دسته</label>
+        <div class="custom-dd-trigger" id="iCatTrigger">
+          <span class="custom-dd-value" id="iCatValue">${escapeHtml(item.cat)}</span>
+          <span class="custom-dd-arrow">▼</span>
+        </div>
+      </div>
+      <div class="field"><label>واحد</label>
+        <div class="custom-dd-trigger" id="iUnitTrigger">
+          <span class="custom-dd-value" id="iUnitValue">${item.unit}</span>
+          <span class="custom-dd-arrow">▼</span>
+        </div>
+      </div>
     </div>
-    <div class="field"><label>موجودی فعلی</label><input type="text" inputmode="decimal" id="iQty" value="${qf(item.qty)}"></div>
     <div class="row2">
-      <div class="field"><label>💰 قیمت فروش</label><input type="text" inputmode="numeric" id="iPrice" placeholder="۴۵۰,۰۰۰" value="${item.price?thousands(item.price):''}"></div>
-      <div class="field"><label>🛒 قیمت خرید</label><input type="text" inputmode="numeric" id="iCost" placeholder="۳۰۰,۰۰۰" value="${item.cost?thousands(item.cost):''}"></div>
+      <div class="field"><label>💰 قیمت فروش</label><input type="text" inputmode="numeric" id="iPrice" value="${item.price ? thousands(item.price) : ''}"></div>
+      <div class="field"><label>⚠️ حداقل موجودی</label><input type="text" inputmode="numeric" id="iMinQty" value="${item.minQty || 2}"></div>
     </div>
-    <div id="iProfitHint" class="profit-tag" style="margin:-8px 0 10px"></div>
-    <div id="iPriceWarn" class="inv-price-warn" style="display:none">⚠️ قیمت فروش کمتر از قیمت خرید است — ضرر می‌کنید!</div>
-    ${it?`<div class="row2">
-      <div class="field"><label>➕ افزودن به موجودی</label><input type="text" inputmode="decimal" id="iAdd" placeholder="۰"></div>
-      <div class="field"><label>➖ کسر از موجودی</label><input type="text" inputmode="decimal" id="iSub" placeholder="۰"></div>
-    </div>`:''}
-    <div class="row2"><button class="btn btn-sage" id="btnSaveItem">💾 ذخیره</button>${it?'<button class="btn btn-ghost" id="btnDelItem" style="color:var(--red-2)">🗑️ حذف</button>':'<div></div>'}</div>
-    ${it?`<div class="grp-title">🔗 مشتریانی که از این کالا استفاده کرده‌اند (${toFa(used.length)})</div>
-      ${used.map(r=>{const w=r.works.find(x=>x.itemId===it.id);return `<div class="list-item" data-open-record="${r.id}"><div class="li-icon">👤</div><div class="li-main"><div class="li-title">${escapeHtml(personOf(r).name)}</div><div class="li-sub">${fmtJalali(r.date)} · ${plateDisplay(r.plate)}</div></div><div class="li-badge">${qf(w.qty)} ${w.unit||''}</div></div>`;}).join('')||'<div class="hint">هنوز استفاده نشده</div>'}`:''}`;
-  $('iCat').onchange=e=>{ if(!it){ const c=STATE.cats.find(x=>x.name===e.target.value); if(c) $('iUnit').value=c.unit; } };
-  commaInput($('iQty'));                                // فیلد موجودی
+    ${!it ? `<div class="field"><label>📦 موجودی اولیه</label><input type="text" inputmode="numeric" id="iInitQty" placeholder="۰"></div>` : ''}
+    <div id="iProfitHint" class="profit-tag" style="margin:-8px 0 12px"></div>
+    ${it ? `<div style="border-top:1px dashed var(--line);margin:16px 0;padding-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:900;color:var(--red-2)">📚 دسته‌های خرید (FIFO)</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700">${toFa(itemBatchCount(item))} دسته</div>
+      </div>
+      <div id="batchesList"></div>
+      <button class="btn btn-sage btn-block btn-sm" id="btnAddNewBatch" style="margin-top:10px">➕ ثبت خرید جدید</button>
+    </div>` : ''}
+    <div class="row2" style="margin-top:14px">
+      <button class="btn btn-primary" id="btnSaveItem">💾 ذخیره</button>
+      ${it ? '<button class="btn btn-ghost" id="btnDelItem" style="color:var(--red-2)">🗑️ حذف</button>' : '<div></div>'}
+    </div>
+    ${it && itemQty(item) > 0 ? `<button class="btn btn-sage btn-block btn-sm" id="btnQuickSale" style="margin-top:8px">🛒 فروش این کالا (خروجی از انبار)</button>
+    <button class="btn btn-warn btn-block btn-sm" id="btnAddWaste" style="margin-top:8px">🗑️ ثبت ضایعات/مصرف</button>` : ''}
+    ${it ? `<button class="btn btn-ghost btn-block btn-sm" id="btnShowLog" style="margin-top:6px">📝 تاریخچه تغییرات این کالا</button>` : ''}
+    ${it && used.length ? `<div style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div class="grp-title">🔗 استفاده در سرویس‌ها (${toFa(used.length)})</div>
+      ${used.slice(0, 5).map(r => {
+        const w = r.works.find(x => x.itemId === it.id);
+        return `<div class="list-item" data-open-record="${r.id}"><div class="li-icon">👤</div><div class="li-main"><div class="li-title">${escapeHtml(personOf(r).name)}</div><div class="li-sub">${fmtJalali(r.date)} · ${plateDisplay(r.plate)}</div></div><div class="li-badge">${qf(w.qty)} ${w.unit || ''}</div></div>`;
+      }).join('')}
+    </div>` : ''}
+  `;
+  function renderBatches(){
+    const listEl = $('batchesList');
+    if(!listEl || !it) return;
+    const batches = [...(it.batches || [])].sort((a, b) => (a.date ? jalaliDayNum(a.date) : 0) - (b.date ? jalaliDayNum(b.date) : 0));
+    if(!batches.length){ listEl.innerHTML = '<div class="hint" style="text-align:center;padding:14px">هنوز خریدی ثبت نشده</div>'; return; }
+    listEl.innerHTML = batches.map((b, idx) => {
+      const isOldest = idx === 0;
+      return `<div style="background:var(--panel-3);border-radius:12px;padding:12px;margin-bottom:8px;${isOldest ? 'border:1.5px solid var(--red-2)' : 'border:1px solid var(--line)'}">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <div style="font-size:11px;font-weight:800;color:${isOldest ? 'var(--red-2)' : 'var(--paper)'}">${b.date ? fmtJalali(b.date) : '—'}${isOldest ? ' <span style="font-size:9px">📌 اول فروش</span>' : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="flex:1;text-align:center;background:var(--panel);border-radius:8px;padding:5px"><div style="font-size:9px;color:var(--muted)">موجودی</div><div style="font-size:12px;font-weight:900">${qf(b.qty)} ${it.unit}</div></div>
+          <div style="flex:1;text-align:center;background:var(--panel);border-radius:8px;padding:5px"><div style="font-size:9px;color:var(--muted)">قیمت خرید</div><div style="font-size:11px;font-weight:900">${shortMoney(b.cost)}</div></div>
+          <div style="flex:1;text-align:center;background:var(--panel);border-radius:8px;padding:5px"><div style="font-size:9px;color:var(--muted)">ارزش</div><div style="font-size:11px;font-weight:900;color:var(--sage)">${shortMoney((b.qty||0)*(b.cost||0))}</div></div>
+          <button class="inv-qty-btn" data-delbatch="${b.id}" style="background:var(--red-bg);color:var(--red-2)">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-delbatch]').forEach(btn => {
+      btn.onclick = () => {
+        const batch = (it.batches || []).find(b => b.id === btn.dataset.delbatch);
+        if(!batch || !confirm('این دسته حذف شود؟')) return;
+        it.batches = it.batches.filter(b => b.id !== btn.dataset.delbatch);
+        saveState(); renderBatches(); renderInventory(); showToast('دسته حذف شد', '🗑️');
+      };
+    });
+  }
+  if(it) renderBatches();
   commaInput($('iPrice'));
-  commaInput($('iCost'));
-  scanAndAttachMoneyInputs();
-  const _updProfit=()=>{
-    const p=toNum($('iPrice').value), c=toNum($('iCost').value);
-    const hint=$('iProfitHint'); if(!hint) return;
-    const warn=$('iPriceWarn');
-    if(!p && !c){ hint.textContent=''; if(warn) warn.style.display='none'; return; }
+  let selectedCat = item.cat;
+  let selectedUnit = item.unit;
+  if($('iCatTrigger')){
+    $('iCatTrigger').onclick = (e) => {
+      e.stopPropagation();
+      const options = STATE.cats.map(c => ({ value: c.name, label: escapeHtml(c.name) }));
+      openCustomSelect('انتخاب دسته', options, selectedCat, (val) => {
+        selectedCat = val;
+        if($('iCatValue')) $('iCatValue').textContent = val;
+        const catObj = STATE.cats.find(c => c.name === val);
+        if(catObj){
+          selectedUnit = catObj.unit;
+          if($('iUnitValue')) $('iUnitValue').textContent = selectedUnit;
+        }
+      });
+    };
+  }
+  if($('iUnitTrigger')){
+    $('iUnitTrigger').onclick = (e) => {
+      e.stopPropagation();
+      const options = [{ value: 'عدد', label: 'عدد' }, { value: 'لیتر', label: 'لیتر' }];
+      openCustomSelect('انتخاب واحد', options, selectedUnit, (val) => {
+        selectedUnit = val;
+        if($('iUnitValue')) $('iUnitValue').textContent = val;
+      });
+    };
+  }
+ commaInput($('iMinQty'));
+  const _updProfit = () => {
+    const p = toNum($('iPrice').value); const c = it ? avgCost : 0; const hint = $('iProfitHint');
+    if(!hint) return;
+    if(!p && !c){ hint.textContent = ''; return; }
     const profit = p - c;
-    hint.className = 'profit-tag' + (profit<0?' loss':'');
-    hint.style.margin = '-8px 0 10px';
-    hint.textContent = profit>=0
-      ? `💰 سود هر واحد: ${money(profit)}`
-      : `⚠️ ضرر هر واحد: ${money(Math.abs(profit))}`;
-    if(warn) warn.style.display = (p>0 && c>0 && profit<0) ? 'block' : 'none';
+    hint.className = 'profit-tag' + (profit < 0 ? ' loss' : '');
+    hint.textContent = profit >= 0 ? `💰 سود هر واحد: ${money(profit)}` : `⚠️ ضرر هر واحد: ${money(Math.abs(profit))}`;
   };
-  $('iPrice').addEventListener('input', _updProfit);
-  $('iCost').addEventListener('input', _updProfit);
-  _updProfit();
-  if(it){ commaInput($('iAdd')); commaInput($('iSub')); } // فیلدهای افزودن/کسر
-  document.querySelectorAll('#sheetBody [data-open-record]').forEach(el=>el.onclick=()=>openRecordSheet(el.dataset.openRecord));
-  $('btnSaveItem').onclick=()=>{
-    const name=$('iName').value.trim(); if(!name){ showToast('نام کالا را وارد کنید','⚠️'); return; }
-    const baseQty = toDec($('iQty').value);
-    let addQty = 0, subQty = 0;
-    if(it){
-      const addEl = $('iAdd'); if(addEl) addQty = toDec(addEl.value);
-      const subEl = $('iSub'); if(subEl) subQty = toDec(subEl.value);
+  $('iPrice').addEventListener('input', _updProfit); _updProfit();
+  const btnAddBatch = $('btnAddNewBatch');
+  if(btnAddBatch) btnAddBatch.onclick = () => { if(!it) return; openAddBatchSheet(it.id); };
+  $('btnSaveItem').onclick = () => {
+    const name = $('iName').value.trim();
+    if(!name){ showToast('نام کالا را وارد کنید', '⚠️'); return; }
+    const price = toNum($('iPrice').value);
+    const minQty = toNum($('iMinQty').value) || 2;
+    const o = it || { id: uid(), batches: [] };
+    const isNew = !it;
+    Object.assign(o, { name, cat: selectedCat, unit: selectedUnit, price, minQty });
+    if(isNew){
+      STATE.inventory.push(o);
+      const initQtyEl = $('iInitQty');
+      const initQty = initQtyEl ? toNum(initQtyEl.value) : 0;
+      if(initQty > 0){
+        addBatch(o, initQty, 0, todayJalali());
+      }
     }
-    const qty = Math.round((baseQty + addQty - subQty) * 1000) / 1000;
-    if(qty<0){ showToast('موجودی نمی‌تواند منفی شود','⚠️'); return; }
-    const price=toNum($('iPrice').value);
-    const cost=toNum($('iCost').value);
-    const o=it||{id:uid()}; Object.assign(o,{name,cat:$('iCat').value,unit:$('iUnit').value,qty,price,cost});
-    if(!it) STATE.inventory.push(o);
-    saveState(); closeSheet(); renderInventory(); showToast('کالا ذخیره شد');
+    logInventoryChange(isNew ? 'add' : 'edit', o.id, o.name, { price, minQty, cat: o.cat });
+    saveState(); closeSheet(); renderInventory(); showToast('کالا ذخیره شد', '✅');
   };
-  if(it) $('btnDelItem').onclick=()=>{
-    if(confirm('این کالا از انبار حذف شود؟ (سوابق سرویس‌ها حفظ می‌شود)')){
-      STATE.inventory=STATE.inventory.filter(x=>x.id!==it.id); saveState(); closeSheet(); renderInventory();
-    }
-  };
+  if(it && $('btnDelItem')){
+    $('btnDelItem').onclick = () => {
+      if(!confirm(`کالای «${it.name}» حذف شود؟`)) return;
+      logInventoryChange('delete', it.id, it.name, { finalQty: itemQty(it), finalValue: itemStockValue(it) });
+      STATE.inventory = STATE.inventory.filter(x => x.id !== it.id);
+      saveState(); closeSheet(); renderInventory(); showToast('کالا حذف شد', '🗑️');
+    };
+  }
+  const btnQuickSale = $('btnQuickSale');
+  if(btnQuickSale && it) btnQuickSale.onclick = () => openQuickSalePickerSheet(it.id);
+  const btnWaste = $('btnAddWaste');
+  if(btnWaste && it) btnWaste.onclick = () => openWasteSheet(it.id);
+  const btnLog = $('btnShowLog');
+  if(btnLog && it) btnLog.onclick = () => openInventoryLogSheet(it.id);
+  document.querySelectorAll('#sheetBody [data-open-record]').forEach(el => {
+    el.onclick = () => openRecordSheet(el.dataset.openRecord);
+  });
   $('sheetOverlay').classList.add('show');
 }
 
@@ -4184,16 +5573,19 @@ function renderSettings(){
   $('setShopPhone').value=STATE.settings.shopPhone||'';
   $('setShopAddress').value=STATE.settings.shopAddress||'';
   $('setReminderDays').value=STATE.settings.reminderDays?toFa(STATE.settings.reminderDays):'';
-  $('catList').innerHTML=STATE.cats.map((c,i)=>{
-    const n=STATE.inventory.filter(x=>x.cat===c.name).length;
-    return `<div class="review-item"><div class="k" style="color:var(--paper);font-size:13px;font-weight:800">${escapeHtml(c.name)} <span class="badge-pill badge-no">${c.unit}</span>${n?` <span class="hint">· ${thousands(n)} کالا</span>`:''}</div>
-    ${n?'<span class="hint" title="ابتدا کالاهای این دسته را حذف کنید">🔒 دارای کالا</span>':`<button class="btn btn-ghost btn-sm" data-delcat="${i}" style="color:var(--red-2)">حذف</button>`}</div>`;}).join('');
-  document.querySelectorAll('[data-delcat]').forEach(b=>b.onclick=()=>{
-    const c=STATE.cats[+b.dataset.delcat];
-    if(STATE.inventory.some(x=>x.cat===c.name)){ showToast('این دسته کالا دارد و قابل حذف نیست','⚠️'); return; }
-    if(STATE.cats.length<=1){ showToast('حداقل یک دسته لازم است','⚠️'); return; }
-    STATE.cats.splice(+b.dataset.delcat,1); saveState(); renderSettings();
-  });
+  const catListEl=$('catList');
+  if(catListEl){
+    catListEl.innerHTML=STATE.cats.map((c,i)=>{
+      const n=STATE.inventory.filter(x=>x.cat===c.name).length;
+      return `<div class="review-item"><div class="k" style="color:var(--paper);font-size:13px;font-weight:800">${escapeHtml(c.name)} <span class="badge-pill badge-no">${c.unit}</span>${n?` <span class="hint">· ${thousands(n)} کالا</span>`:''}</div>
+      ${n?'<span class="hint" title="ابتدا کالاهای این دسته را حذف کنید">🔒 دارای کالا</span>':`<button class="btn btn-ghost btn-sm" data-delcat="${i}" style="color:var(--red-2)">حذف</button>`}</div>`;}).join('');
+    document.querySelectorAll('[data-delcat]').forEach(b=>b.onclick=()=>{
+      const c=STATE.cats[+b.dataset.delcat];
+      if(STATE.inventory.some(x=>x.cat===c.name)){ showToast('این دسته کالا دارد و قابل حذف نیست','⚠️'); return; }
+      if(STATE.cats.length<=1){ showToast('حداقل یک دسته لازم است','⚠️'); return; }
+      STATE.cats.splice(+b.dataset.delcat,1); saveState(); renderSettings();
+    });
+  }
   try{ renderDefaultsUI(); }catch(e){ console.warn('defaults ui', e); }
 }
 let _settingsTimer=null;
@@ -4204,11 +5596,12 @@ $('setShopPhone').addEventListener('input',e=>{ STATE.settings.shopPhone=e.targe
 $('setShopAddress').addEventListener('input',e=>{ STATE.settings.shopAddress=e.target.value; _saveSettingsDebounced(); });
 $('setReminderDays').addEventListener('input',e=>{ const n=toNum(e.target.value); STATE.settings.reminderDays=n>0?n:180; saveState(); });
 $('setReminderDays').addEventListener('blur',()=>{ try{ renderDashboard(); }catch(e){} });
-$('btnAddCat').addEventListener('click',()=>{
-  const n=$('newCatName').value.trim();
+if($('btnAddCat')) $('btnAddCat').addEventListener('click',()=>{
+  const n=($('newCatName')&&$('newCatName').value||'').trim();
   if(!n){ showToast('نام دسته را وارد کنید','⚠️'); return; }
   if(STATE.cats.some(c=>c.name===n)){ showToast('این دسته وجود دارد','⚠️'); return; }
-  STATE.cats.push({name:n,unit:$('newCatUnit').value}); $('newCatName').value=''; saveState(); renderSettings(); showToast('دسته اضافه شد');
+  const unitEl=$('newCatUnit');
+  STATE.cats.push({name:n,unit:unitEl?unitEl.value:'عدد'}); if($('newCatName')) $('newCatName').value=''; saveState(); renderSettings(); showToast('دسته اضافه شد');
 });
 $('btnExportData').addEventListener('click',()=>{
   const blob=new Blob([JSON.stringify(STATE,null,2)],{type:'application/json'});
@@ -4344,6 +5737,7 @@ document.querySelectorAll('.tab-btn').forEach(b=>{
   b.onclick=()=>switchTab(b.getAttribute('data-tab'));
 });
 document.getElementById('btnNewServiceDash').onclick=()=>switchTab('new');
+if(document.getElementById('btnQuickSaleDash')) document.getElementById('btnQuickSaleDash').onclick = () => { openQuickSalePickerSheet(); };
 document.getElementById('btnGoSearchDash').onclick=()=>switchTab('search');
 document.getElementById('btnGoSettingsDash').onclick=()=>switchTab('settings');
 document.getElementById('btnGoReportsDash').onclick=()=>switchTab('reports');
@@ -4466,15 +5860,39 @@ function renderAll(){
   if($('view-calendar').classList.contains('active')) renderCalendar();
 }
 
+
+setTimeout(function(){
+  var invTabSeg = $('invTabSeg');
+  if(invTabSeg && !invTabSeg._bound){
+    invTabSeg._bound = true;
+    invTabSeg.querySelectorAll('[data-invtab]').forEach(function(b){
+      b.onclick = function(){
+        invTabSeg.querySelectorAll('[data-invtab]').forEach(function(x){ x.classList.toggle('active', x === b); });
+        renderInventory();
+      };
+    });
+  }
+  var peopleTabSeg = $('peopleTabSeg');
+  if(peopleTabSeg && !peopleTabSeg._bound){
+    peopleTabSeg._bound = true;
+    peopleTabSeg.querySelectorAll('[data-ptab]').forEach(function(b){
+      b.onclick = function(){
+        peopleTabSeg.querySelectorAll('[data-ptab]').forEach(function(x){ x.classList.toggle('active', x === b); });
+        renderPeople();
+      };
+    });
+  }
+}, 300);
+
 let init = function(){
   STATE=loadState();
+  migrateInventoryToFIFO();
   applyTheme();
   const today=todayJalali();
   document.getElementById('dateChip').textContent = fmtJalali(today);
   renderAll();
 };
-// ===== LICENSE (Supabase) — موقتاً غیرفعال برای توسعهٔ فیچر جدید =====
-// LIC_ANON و licDeviceId برای همگام‌سازی لازم‌اند و فعال می‌مانند.
+// ===== LICENSE (Supabase) =====
 const LIC_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttamR5YWF1d29pampsZ3h5bnBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1NzQzMjAsImV4cCI6MjEwODE1MDMyMH0.8CdntulVMCahcyk1r9aAskFnnYkDf-5ydoP703pIcak';
 function licDeviceId(){
   let d=null; try{ d=localStorage.getItem('as_device'); }catch(e){}
@@ -4490,10 +5908,9 @@ function licDeviceId(){
   }
   return d;
 }
-/* --- شروع بخش کامنت‌شدهٔ لایسنس (برای فعال‌سازی دوباره، این بلوک را از کامنت درآورید) ---
-// ============================================================
+/* ============================================================
    LICENSE (Supabase)
-   ============================================================ 
+   ============================================================ */
 const LIC_URL='https://kmjdyaauwoijjlgxynpa.supabase.co/functions/v1/license';
 const LIC_PUB='MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEb81CUM48To5Q1nsoGnhnKB7KPVqTNm1gd4R3UnGFvHYxT9Dc+jvxhBIfJoqZYDHMU5hV3aObRbRi2EndIHwkYg==';
 const LIC_MSG={relogin:'نشست شما توسط مدیر پایان یافت؛ لطفاً دوباره کلید لایسنس را وارد کنید.',invalid:'کلید لایسنس معتبر نیست یا مسدود شده است.',expired:'مدت اعتبار این لایسنس تمام شده است.',other_device:'این لایسنس روی دستگاه دیگری فعال شده است.',clock:'ساعت دستگاه نادرست است. تاریخ و ساعت را اصلاح کنید.',offline_expired:'برای تأیید لایسنس باید یک‌بار به اینترنت وصل شوید.',none:'برای استفاده از برنامه کلید لایسنس را وارد کنید.',error:'خطا در ارتباط با سرور؛ اینترنت را بررسی کنید.',server_error:'خطای سرور؛ کمی بعد دوباره تلاش کنید.',bad_request:'کلید را کامل وارد کنید.'};
@@ -4561,48 +5978,110 @@ document.getElementById('licBtn').onclick=async()=>{
   else document.getElementById('licMsg').textContent=LIC_MSG[r]||LIC_MSG.error;
 };
 
---- پایان بخش کامنت‌شدهٔ لایسنس --- */
 /* ============================================================
    CLOUD SYNC (Supabase) — merge per record, last-write-wins
    ============================================================ */
 const SYNC_URL='https://kmjdyaauwoijjlgxynpa.supabase.co/functions/v1/sync';
-const SYNC_COLLS=['services','people','inventory','debts'];
-const SYNC_SINGLES=['cats','quick'];
+const SYNC_COLLS=['services','people','inventory','debts','sales'];
+const SYNC_SINGLES=['cats','quick','shop'];
+const SYNC_APPEND=['inventoryLog'];                 // فقط اضافه می‌شود (بدون حذف)، سقف ۵۰۰
+const SYNC_LOCAL_SETTINGS=['displayName','theme'];  // تنظیمات مخصوص هر دستگاه (همگام نمی‌شوند)
 let syncing=false, syncTimer=null, syncStarted=false;
 function hashOf(o){ const s=JSON.stringify(o); let h=5381; for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return h; }
+const clone=o=>JSON.parse(JSON.stringify(o));
+const r3=n=>Math.round(n*1000)/1000;
+/* ---- تنظیمات مغازه (بدون تنظیمات مخصوص دستگاه) ---- */
+function shopSettings(src){ const o={}; Object.keys(src||{}).forEach(k=>{ if(!SYNC_LOCAL_SETTINGS.includes(k)) o[k]=src[k]; }); return o; }
+function getSingle(k){ return k==='shop'?shopSettings(STATE.settings):STATE[k]; }
+function setSingle(k,v){ if(k==='shop') Object.assign(STATE.settings,clone(v)); else STATE[k]=v; }
+function defaultSingle(k){ const d=defaultState(); return k==='shop'?shopSettings(d.settings):d[k]; }
+/* ---- موجودی کالا: ادغام بر اساس تفاضل (حفظ کسر هم‌زمان از دو دستگاه) ---- */
+function stockOf(it){
+  if(Array.isArray(it.batches)){ const m={}; it.batches.forEach(b=>m[b.id]=Number(b.qty)||0); return {b:m}; }
+  return {q:Number(it.qty)||0};
+}
+function mergeStock(l,r,base,rNewer){
+  const res=clone(rNewer?r:l);
+  if(!base) return res;
+  if(Array.isArray(l.batches)&&Array.isArray(r.batches)&&base.b){
+    const lb={}, rb={}; l.batches.forEach(b=>lb[b.id]=b); r.batches.forEach(b=>rb[b.id]=b);
+    const ids=new Set(Object.keys(lb).concat(Object.keys(rb),Object.keys(base.b))), out=[];
+    ids.forEach(id=>{
+      const src=(rNewer?rb[id]:lb[id])||(rNewer?lb[id]:rb[id]); if(!src) return;
+      const bq=base.b[id];
+      if(bq===undefined){ out.push(clone(src)); return; }
+      const lq=lb[id]?Number(lb[id].qty)||0:0, rq=rb[id]?Number(rb[id].qty)||0:0;
+      const q=r3(Math.max(0,bq+(lq-bq)+(rq-bq)));
+      if(q>0){ const o=clone(src); o.qty=q; out.push(o); }
+    });
+    res.batches=out;
+    if(typeof res.qty==='number') res.qty=r3(out.reduce((s,b)=>s+(Number(b.qty)||0),0));
+  } else if(typeof l.qty==='number'&&typeof r.qty==='number'&&base.q!==undefined){
+    res.qty=r3(Math.max(0,base.q+(l.qty-base.q)+(r.qty-base.q)));
+  }
+  return res;
+}
+function snapBase(){
+  const S=STATE.sync; S.base={inventory:{}};
+  STATE.inventory.forEach(i=>S.base.inventory[i.id]=stockOf(i));
+}
+/* ---- ثبت تغییرات ---- */
 function stampChanges(){
   const S=STATE.sync, now=Date.now();
+  S.meta=S.meta||{}; S.singles=S.singles||{};
   SYNC_COLLS.forEach(c=>{
+    if(!Array.isArray(STATE[c])) STATE[c]=[];
     const meta=S.meta[c]||(S.meta[c]={}), seen={};
-    STATE[c].forEach(r=>{ seen[r.id]=1; const h=hashOf(r), m=meta[r.id]; if(!m||m.del||m.h!==h) meta[r.id]={h,u:now}; });
+    STATE[c].forEach(r=>{ if(!r||!r.id) return; seen[r.id]=1; const h=hashOf(r), m=meta[r.id]; if(!m||m.del||m.h!==h) meta[r.id]={h,u:now}; });
     Object.keys(meta).forEach(id=>{ if(!seen[id]&&!meta[id].del) meta[id]={del:true,u:now}; });
   });
-  SYNC_SINGLES.forEach(k=>{ const h=hashOf(STATE[k]), m=S.singles[k]; if(!m||m.h!==h) S.singles[k]={h,u:now}; });
+  SYNC_SINGLES.forEach(k=>{
+    const h=hashOf(getSingle(k)), m=S.singles[k];
+    if(!m) S.singles[k]={h,u:(h===hashOf(defaultSingle(k)))?0:now};   // مقدار پیش‌فرض، تغییر کاربر حساب نمی‌شود
+    else if(m.h!==h) S.singles[k]={h,u:now};
+  });
 }
 function syncPayload(){
-  const data={}; SYNC_COLLS.concat(SYNC_SINGLES).forEach(k=>data[k]=STATE[k]);
+  const data={}; SYNC_COLLS.concat(SYNC_APPEND).forEach(k=>data[k]=STATE[k]||[]);
+  SYNC_SINGLES.forEach(k=>data[k]=getSingle(k));
   return {data,meta:STATE.sync.meta,singles:STATE.sync.singles};
 }
+/* ---- ادغام داده‌های سرور؛ اگر نتیجه با سرور فرق دارد true برمی‌گرداند ---- */
 function mergeRemote(rem){
-  const S=STATE.sync;
+  const S=STATE.sync; let needPush=false;
+  const base=(S.base&&S.base.inventory)||{};
   SYNC_COLLS.forEach(c=>{
     const lm=S.meta[c]||(S.meta[c]={}), rm=(rem.meta&&rem.meta[c])||{};
     const lmap={}, rmap={};
-    STATE[c].forEach(r=>lmap[r.id]=r); ((rem.data&&rem.data[c])||[]).forEach(r=>rmap[r.id]=r);
+    (STATE[c]||[]).forEach(r=>{ if(r&&r.id) lmap[r.id]=r; }); ((rem.data&&rem.data[c])||[]).forEach(r=>{ if(r&&r.id) rmap[r.id]=r; });
     const ids=new Set(Object.keys(lm).concat(Object.keys(rm))), out=[], nm={};
     ids.forEach(id=>{
       const l=lm[id], r=rm[id], useR=r&&(!l||r.u>l.u), m=useR?r:l;
-      if(m.del){ nm[id]={del:true,u:m.u}; return; }
-      const rec=useR?rmap[id]:lmap[id]; if(!rec) return;
-      out.push(rec); nm[id]={h:hashOf(rec),u:m.u};
+      if(m.del){ nm[id]={del:true,u:m.u}; if(!(r&&r.del)) needPush=true; return; }
+      let rec=useR?rmap[id]:lmap[id]; if(!rec) return;
+      let u=m.u;
+      if(c==='inventory'&&l&&r&&!l.del&&!r.del&&lmap[id]&&rmap[id]){
+        const merged=mergeStock(lmap[id],rmap[id],base[id],!!useR);
+        if(hashOf(merged)!==hashOf(rmap[id])){ rec=merged; u=Date.now(); needPush=true; } else rec=merged;
+      } else if(!useR&&l&&(!r||r.u<l.u)) needPush=true;
+      out.push(rec); nm[id]={h:hashOf(rec),u};
     });
     STATE[c]=out; S.meta[c]=nm;
   });
+  SYNC_APPEND.forEach(k=>{
+    const seen={}, all=[];
+    (STATE[k]||[]).concat((rem.data&&rem.data[k])||[]).forEach(x=>{ if(x&&x.id&&!seen[x.id]){ seen[x.id]=1; all.push(x); } });
+    all.sort((a,b)=>(b.at||0)-(a.at||0));
+    if((STATE[k]||[]).length!==all.length) needPush=true;
+    STATE[k]=all.slice(0,500);
+  });
   SYNC_SINGLES.forEach(k=>{
     const l=S.singles[k], r=rem.singles&&rem.singles[k];
-    if(r&&rem.data&&rem.data[k]&&(!l||r.u>l.u)){ STATE[k]=rem.data[k]; S.singles[k]={h:hashOf(STATE[k]),u:r.u}; }
+    if(r&&rem.data&&rem.data[k]!==undefined&&(!l||r.u>l.u)){ setSingle(k,rem.data[k]); S.singles[k]={h:hashOf(getSingle(k)),u:r.u}; }
+    else if(l&&l.u>0&&(!r||l.u>r.u)) needPush=true;
   });
   STATE.services.forEach(migrate);
+  return needPush;
 }
 function currentLicKey(){
   try{ const t=localStorage.getItem('as_token'); return t?JSON.parse(atob(t.split('.')[0])).key:null; }catch(e){ return null; }
@@ -4635,7 +6114,7 @@ async function syncNow(manual){
       const pull=await syncCall({action:'pull'});
       if(pull.error) throw new Error(pull.error);
       let changed=false;
-      if(pull.payload&&pull.version!==STATE.sync.version){ mergeRemote(pull.payload); STATE.sync.version=pull.version; changed=true; }
+      if(pull.payload&&pull.version!==STATE.sync.version){ if(mergeRemote(pull.payload)) STATE.sync.dirty=true; STATE.sync.version=pull.version; changed=true; }
       if(STATE.sync.dirty||pull.version===0){
         const res=await syncCall({action:'push',expected:pull.version,payload:syncPayload()});
         if(res.ok){ STATE.sync.version=res.version; STATE.sync.dirty=false; done=true; }
@@ -4643,11 +6122,15 @@ async function syncNow(manual){
       } else done=true;
       if(changed){ persistRaw(); renderAll(); }
     }
+    if(!done) throw new Error('conflict');
+    snapBase();
     STATE.sync.last=Date.now(); persistRaw();
     setSyncStatus(syncLabel());
+    if(manual&&typeof showToast==='function') showToast('همگام‌سازی انجام شد','☁️');
   }catch(e){
     const m=String(e&&e.message||'');
-    setSyncStatus(m==='other_device'||m==='invalid'||m==='expired'?'⛔ همگام‌سازی برای این لایسنس مجاز نیست.':'⚠️ ارتباط با سرور برقرار نشد؛ بعداً دوباره تلاش می‌شود.');
+    setSyncStatus(m==='other_device'||m==='invalid'||m==='expired'?'⛔ همگام‌سازی برای این لایسنس مجاز نیست.':(m==='conflict'?'⚠️ هم‌زمانی با دستگاه دیگر؛ دوباره تلاش می‌شود.':'⚠️ ارتباط با سرور برقرار نشد؛ بعداً دوباره تلاش می‌شود.'));
+    if(manual&&typeof showToast==='function') showToast('همگام‌سازی ناموفق بود','⚠️');
   }finally{ syncing=false; }
 }
 function startSync(){
@@ -4715,20 +6198,37 @@ function calcServiceTotal(works){
   return Math.round(calcServiceBreakdown(works).reduce((a,x)=>a+x.total,0));
 }
 function calcServiceBreakdown(works){
-  const rows=[];
-  (works||[]).forEach(w=>{
-    const it = w.itemId ? STATE.inventory.find(x=>x.id===w.itemId) : null;
-    const sp = (w.ip !== undefined) ? (w.ip||0) : (it ? (it.price||0) : 0);
-    const sc = (w.ic !== undefined) ? (w.ic||0) : (it ? (it.cost||0) : 0);
-    let unitPrice = sp || 0;
-    let unitCost = sc || 0;
-    let src = it ? 'کالا' : '';
-    if(!unitPrice && w.price && !it){ unitPrice = w.price; src = 'کار'; }
+  const rows = [];
+  (works||[]).forEach(w => {
+    const it = w.itemId ? STATE.inventory.find(x => x.id === w.itemId) : null;
+    let unitPrice = 0;
+    if(w.ip !== undefined && w.ip > 0) unitPrice = w.ip;
+    else if(w.price > 0) unitPrice = w.price;
+    else if(it) unitPrice = it.price || 0;
+    let unitCost = 0;
+    let costSource = '';
+    if(w.actualCost !== undefined && w.actualCost > 0 && w.qty > 0){
+      unitCost = Math.round(w.actualCost / w.qty);
+      costSource = 'fifo';
+    } else if(w.ic !== undefined && w.ic > 0){
+      unitCost = w.ic;
+      costSource = 'legacy';
+    } else if(it){
+      unitCost = itemAvgCost(it);
+      costSource = 'avg';
+    }
     const qty = parseFloat(w.qty) || 1;
     rows.push({
-      name: workText(w), qty, unitPrice, unitCost,
-      total: unitPrice * qty, cost: unitCost * qty, src,
-      itemId: w.itemId || '', itemName: it ? it.name : (w.name || '')
+      name: workText(w),
+      qty,
+      unitPrice,
+      unitCost,
+      total: unitPrice * qty,
+      cost: unitCost * qty,
+      actualCost: w.actualCost || 0,
+      costSource,
+      itemId: w.itemId || '',
+      itemName: it ? it.name : (w.name || '')
     });
   });
   return rows;
@@ -5526,7 +7026,7 @@ function maybeShowDailySummary(){
   const todayRev = todayRecs.reduce((a,r)=>{
     return a + calcServiceBreakdown(r.works).reduce((s,x)=>s+(x.total||0),0);
   }, 0);
-  const lowStock = STATE.inventory.filter(i=>(i.qty||0) <= 2).length;
+  const lowStock = STATE.inventory.filter(i=>itemQty(i) <= (i.minQty||2)).length;
 
   if(list.length === 0 && todayRecs.length === 0 && lowStock === 0) return;
 
@@ -6463,7 +7963,6 @@ document.addEventListener('click', function delegatedWaCall(e){
   if(call){ e.preventDefault(); openCall(call.dataset.callPhone); return; }
 });
 
-// لایسنس موقتاً غیرفعال است؛ برنامه مستقیم اجرا می‌شود.
 
 function openCustomSelect(title, options, currentValue, onSelect){
   $('sheetTitle').textContent = title;
@@ -6496,8 +7995,12 @@ function setupKeyboardFix(){
   });
   document.addEventListener('focusin', (e)=>{
     const el = e.target;
-    if(!el || !/INPUT|TEXTAREA|SELECT/i.test(el.tagName)) return;
-    setTimeout(()=>{ try{ el.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){} }, 300);
+    if(!el || !/INPUT|TEXTAREA/i.test(el.tagName)) return;
+    setTimeout(()=>{
+      if (document.body.classList.contains('keyboard-open')) {
+        try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(err){}
+      }
+    }, 400);
   });
 }
 setupKeyboardFix();
@@ -6928,7 +8431,7 @@ function renderDefaultsUI(){
   }
 }
 
-init();
+licStart();
 
 // Service Worker حذف شد — برای اندروید نیتیو لازم نیست
 </script>
